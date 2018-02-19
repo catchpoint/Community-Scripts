@@ -1,0 +1,647 @@
+<script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function (event) {
+            var selector = CPVisualization.getContainerSelector();
+            var visualization = CPVisualization.getData();
+			var summary_visualization = CPVisualization.getSummaryData();
+            var headers = visualization.headers;
+			var summary_header = summary_visualization.headers;
+            var metrics = headers.metrics;
+            var metricCount = metrics.length;
+            var data = visualization.data;
+			var summary_data = summary_visualization.data;
+            var hasBreakdown1 = !!headers.breakdown1;
+            var hasBreakdown2 = !!headers.breakdown2;
+            //console.log(visualization);
+            //console.log(summary_visualization);
+
+			function inIframe () {
+			try {
+				return window.self !== window.top;
+			} catch (e) {
+					return true;
+				}
+			}
+
+			function setScroll()   {
+			   var ifs = window.top.document.getElementsByTagName("iframe");
+			   for(var i = 0, len = ifs.length; i < len; i++)  {
+				  var f = ifs[i];
+				  var fDoc = f.contentDocument || f.contentWindow.document;
+				  if(fDoc === document)   {
+					 f.setAttribute("scrolling","yes");
+					 temp_width = $('#tbl_main_display_chart').width();
+					 temp_height = $('#tbl_main_display_chart').height();
+                     temp_height = temp_height + 100;
+					 temp_width = temp_width + 60;
+					 //console.log(temp_width);
+					 //console.log(temp_height);
+					 var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+					 var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+					 //console.log(w);
+					 //console.log(h);
+					 f.setAttribute("style"," width: "+temp_width+"px; height: "+temp_height+"px; overflow-x: scroll;overflow: scroll;overflow-y: scroll;")
+				  }
+				}
+			}
+
+
+           $(document).ready(function () {
+
+           if(inIframe())
+		   {  
+				//setScroll(); // this was called initially 
+				// above deactivated for try
+				//$("#iframe_id").attr("scrolling", "yes");
+		   }	
+
+           });
+
+
+		   /*$(window).resize(function(){
+
+                if(inIframe())
+			   {  
+					setScroll(); // this was called initially 
+					// above deactivated for try
+					//$("#iframe_id").attr("scrolling", "yes");
+			   }	
+           });
+            */
+		   function formatDate(date) {
+			 var monthNames = [
+					"Jan", "Feb", "Mar",
+					"Apr", "May", "Jun", "Jul",
+					"Aug", "Sep", "Oct",
+					"Nov", "Dec"
+			 ]; 
+
+			  var hours = date.getHours();
+			  var minutes = date.getMinutes();
+			  var ampm = hours >= 12 ? 'pm' : 'am';
+			  hours = hours % 12;
+			  hours = hours ? hours : 12; // the hour '0' should be '12'
+			  minutes = minutes < 10 ? '0'+minutes : minutes;
+			  var strTime = hours + ':' + minutes + ' ' + ampm;
+			  return monthNames[date.getMonth()] + " " + date.getDate() + "<br/> " + strTime;
+			}
+
+			function sortProperties(obj)
+			{
+			  // convert object into array
+				var sortable=[];
+				for(var key in obj)
+					if(obj.hasOwnProperty(key))
+						sortable.push([key, obj[key]]); // each item is an array in format [key, value]
+
+				// sort items by value
+				sortable.sort(function(a, b)
+				{
+				  return b[1]-a[1]; // compare numbers
+				});
+				return sortable; // array in format [ [ key1, val1 ], [ key2, val2 ], ... ]
+			}
+
+
+			time_interval = {};
+			error_arr = [];
+			error_type = {};
+			tests = {};
+		    error_wrt_test = {};
+			//console.log(summary_header);
+			//error_arr.push("Availability");
+			for(i=1;i<summary_header.metrics.length ; i++)
+			{
+				temp_err = summary_header.metrics[i];
+				temp_err =  temp_err.replace('# ',"");
+				temp_err =  temp_err.replace(' Failures',"");
+				temp_err =  temp_err.replace('Tests with ',"");
+				temp_err =  temp_err.replace('Connection',"Conn");
+				temp_err =  temp_err.replace('Response',"Resp");
+				temp_err =  temp_err.replace(' Errors',"");
+				temp_err =  temp_err.replace('Timeout',"Tm-Out");
+				temp_err =  temp_err.replace('Avg ',"");
+				temp_err = temp_err.trim();
+				error_arr.push(temp_err);
+
+			}	
+			//console.log(error_arr);
+
+			for(i = 0 ;i < data.length;i++)
+			{   
+		       //console.log('I am here');
+                //   
+		        var temp_dimension = new Date(data[i].dimension);  //parseDate(data[i].dimension);
+                // make a unique list of date time 
+				if (typeof time_interval[temp_dimension] == "undefined") {
+
+					time_interval[temp_dimension] = true;
+
+				}
+
+				// make list of unique tests
+				if (typeof tests[data[i].breakdown1] == "undefined") {
+
+					tests[data[i].breakdown1] = data[i].metrics[0];;
+
+				}
+
+
+				if (typeof error_wrt_test[data[i].breakdown1] == "undefined") {
+						error_wrt_test[data[i].breakdown1] = {};
+				}
+
+				if (typeof error_wrt_test[data[i].breakdown1][temp_dimension] == "undefined") {
+
+						error_wrt_test[data[i].breakdown1][temp_dimension] = {};
+				}
+
+				// this section of code , you need to be careful 
+				// dont get confuse here, 1st data metrics would be availability so we are ignoring
+               // but error type arr should start from zero only 				
+
+				for(j =1 ;j < data[i].metrics.length -1 ; j++)
+                { 					
+
+
+					//make a list of unique error type
+					if (data[i].metrics[j] !== null && typeof error_wrt_test[data[i].breakdown1][temp_dimension][error_arr[j-1]] == "undefined" ) {
+
+						error_wrt_test[data[i].breakdown1][temp_dimension][error_arr[j-1]] = data[i].metrics[j];
+						// collect only those testes error which make sense in report avoid null error
+						//console.log("error name " + error_arr[j] + " counter " + j );
+						error_type[error_arr[j-1]] = true;
+
+					}
+                }
+
+				error_wrt_test[data[i].breakdown1][temp_dimension]['Avl'] = data[i].metrics[0];
+
+
+             }
+			var tests_metrics = {}; 
+			for(i = 0 ;i < summary_data.length;i++)
+			{
+    			// make list of unique tests
+				if (typeof tests_metrics[summary_data[i].breakdown1] == "undefined") {
+
+					tests_metrics[summary_data[i].breakdown1] = summary_data[i].metrics[0];
+
+				}	
+            }		
+
+			temp_time_interval =  Object.keys(time_interval).sort();
+			temp_error_type =  Object.keys(error_type).sort();
+			temp_tests =  Object.keys(tests).sort();
+            sorted_test_metrics =  sortProperties(tests_metrics); 
+            //console.log(temp_error_type);
+			//console.log(error_type);
+			//console.log(tests);
+			//console.log(sorted_test_metrics);
+			//console.log(error_wrt_test);
+			if(temp_error_type.length == 0 )
+			{
+
+				d3.select(selector).append("div").attr("class","no_error_display").text("We'r Good Now, NO ERROR!!!");
+
+			}
+		    else{
+
+				   legend_data = "<table width='450px' style='background-color: #353434;font-size: small;'><tr style='background-color: #353434;font-size: small;'><td class='SSL'>☹</td><td><b>SSL Failures</b></td><td class='DNS'>☹</td><td><b>DNS Failures</b><td><td class='Conn'>☹</td><td> <b>Connection Failures</b></td></tr><tr><td colspan=3  style='background-color: #353434;'>&nbsp</td></tr>        <tr style='background-color: #353434;font-size: small;'><td class='Resp'>☹</td><td><b>Response Failures</b></td><td class='Tm-Out'>☹</td><td><b>Time out Failures</b><td><td class='JS'>☹</td><td><b>Test with JS Errors</b></td></tr><tr><td colspan=3  style='background-color: #353434;'> </td></tr><tr style='background-color: #353434;font-size: small;'><td colspan=3  style='background-color: #353434;'>&nbsp</td></tr>  <tr style='background-color: #353434;font-size: small;'><td class='others_error'>☹</td><td><b>Other Error</b></td><td colspan = 4  style='background-color: #353434;'></td></tr><tr><td colspan=3  style='background-color: #353434;'></td></tr>  </table>"
+
+				   	/*temp_div = tr.append("td").attr("class","td_bottom").append('div').attr("class","tooltip");
+									temp_div.append("span").attr('class','tic_mark').html("✔");
+									temp_div.append("div").attr("class","tooltiptext").html(title_val);*/ //this is active code
+
+                   var main_cntainer =  d3.select(selector).append("div");
+                   var  legend =    main_cntainer.append("div").attr("class","tooltip");
+				   legend.append("span").attr('class','legend_info').html("Legends Information  ⛹<p>");
+				   legend.append("div").attr("class","tooltiptext_legend").html(legend_data);
+			       var table = main_cntainer.append("table").attr("class", "data-tbl srch-mod-tbl").attr("style","width: 100%;").attr("id","tbl_main_display_chart");
+
+					var report_period  = parseInt(((new Date(temp_time_interval[temp_time_interval.length - 1]) - new Date(temp_time_interval[0]))/1000)/3600)
+					var thead = table.append("thead");
+					var tr = thead.append("tr");
+
+					if (hasBreakdown1) {
+					   tr.append("th").attr("rowspan",2).attr("data-sort", "bd1").append("span").text(headers.breakdown1);
+					}
+					tr.append("th").attr('class','th_summary').attr("rowspan",2).append("span").text('Avail in '+ report_period + ' hour(s)');
+
+					for( i = temp_time_interval.length - 1 ; i >= 0 ; i-- )
+					{
+
+						display_dt = formatDate(new Date(temp_time_interval[i])) 
+						// colspan include avl time for given interval and one other error column
+						tr.append("th").attr("class","first_td").attr("nowrap","nowrap").attr("data-sort", i).html(display_dt);
+                        //.attr("colspan",temp_error_type.length + 2)
+					}
+
+					var tr = thead.append("tr");
+                    /*
+					for( j = temp_time_interval.length - 1 ; j >= 0 ; j-- )
+					{
+						tr.append("th").attr("class","first_td").attr("rowspan",2).attr("data-sort", "bd1").append("span").attr('class','err_name_disp').text('Avail');
+						 tr.append("th").attr("colspan",temp_error_type.length+1).append("span").attr('class','err_name_disp').text(' ');
+
+						/*for( i = temp_error_type.length - 1 ; i >= 0 ; i-- )
+						{
+							 tr.append("th").append("span").attr('class','err_name_disp').text(temp_error_type[i]);
+						}
+						*/
+						/*//tr.append("th").attr("data-sort", "bd1").append("span").attr('class','err_name_disp').text('Other');
+					}*/
+					var tbody =  table.append("tbody");
+					var counter = 1;
+					for (k = sorted_test_metrics.length -1; k>=0 ; k--)
+					{	
+						var tr = tbody.append("tr");
+						temp_var = sorted_test_metrics[k][0].replace(/^\[\d+\].-./i,"");
+						test_name = temp_var;
+						if(sorted_test_metrics[k][1] == 100)
+						{
+							continue;
+						}	
+						tr.append("td").append("span").attr('class','test_name').text(test_name); // show test name
+
+						// average availability section
+						if(sorted_test_metrics[k][1] <= 20)
+						{
+							tr.append("td").attr("class","critical_alarm").append("span").text(sorted_test_metrics[k][1]); // show avg availability 
+
+						}else if(sorted_test_metrics[k][1] > 20 && sorted_test_metrics[k][1] <= 60 )
+						{
+							tr.append("td").attr("class","warning_alarm").append("span").text(sorted_test_metrics[k][1]); // show avg availability 
+
+						}
+						else
+						{					
+							tr.append("td").attr("class","green_alarm").append("span").text(sorted_test_metrics[k][1]); // show avg availability 
+						}
+
+						for( j = temp_time_interval.length - 1 ; j >= 0 ; j-- )
+						{
+							error_table_string = "<tr>";
+							sub_perc_table = "";
+							check_error_available = false;
+							//console.log(test_name);
+							//console.log(new Date(temp_time_interval[j]));
+							if(typeof error_wrt_test[test_name][new Date(temp_time_interval[j])] == "undefined")
+							{
+								error_wrt_test[test_name][new Date(temp_time_interval[j])] = {};	
+							}
+
+
+
+
+							var check_for_other_error = true;
+							var element_err_counter = 1; 
+
+							for( i = temp_error_type.length - 1 ; i >= 0 ; i-- )
+							{
+								if(typeof error_wrt_test[test_name][new Date(temp_time_interval[j])][temp_error_type[i]] == "undefined")
+								{
+									error_wrt_test[test_name][new Date(temp_time_interval[j])][temp_error_type[i]] = 0;
+								}
+
+								if(error_wrt_test[test_name][new Date(temp_time_interval[j])][temp_error_type[i]]>0)
+								{	
+									var title_val  = "Test name: " +  test_name + "<br> Error:  " + temp_error_type[i] + "<br> Error count : " + error_wrt_test[test_name][new Date(temp_time_interval[j])][temp_error_type[i]] + "<Br> DT: " + formatDate(new Date(temp_time_interval[j]));
+                                    //.attr("title",title_val). 
+									/*temp_div = tr.append("td").attr("class","td_bottom").append('div').attr("class","tooltip");
+									temp_div.append("span").attr('class','tic_mark').html("✔");
+									temp_div.append("div").attr("class","tooltiptext").html(title_val);*/ //this is active code
+									error_table_string = error_table_string + '<td class="'+temp_error_type[i]+'"><div class="tooltip"><span class="tic_mark">☹</span><div class="tooltiptext">'+title_val +'</div></div></td>';
+									check_for_other_error = false;
+									check_error_available =  true;
+									element_err_counter++;
+								}else{
+
+									//tr.append("td").attr("class","td_bottom").append("span").html("✖");
+									//tr.append("td").attr("class","td_bottom").append("span").text("-"); // this is active code
+								}
+							}
+                            /*console.log(parseInt(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']))
+							console.log(check_for_other_error);
+							console.log(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']);
+							console.log(formatDate(new Date(temp_time_interval[j])));*/
+							// && error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl'] != "" // following condition was kept below
+							if (check_for_other_error && parseInt(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']) < 100 )
+							{
+								var title_val  = "Test name: " +  test_name + "<br> Error:  Other Errors <br> Error count : " + error_wrt_test[test_name][new Date(temp_time_interval[j])][temp_error_type[i]] + "<Br> DT: " + formatDate(new Date(temp_time_interval[j]));
+								//tr.append("td").attr("class","td_bottom").attr("title",title_val).append("span").attr('class','tic_mark').html("✔"); // this was active code
+								error_table_string = error_table_string + '<td class="others_error"><div class="tooltip"><span class="tic_mark">☹</span><div class="tooltiptext">'+title_val +'</div></div></td>';
+								check_error_available = true;
+								element_err_counter++;
+							}
+							else
+							{
+								//tr.append("td").attr("class","td_bottom").append("span").html("✖");
+								/////tr.append("td").attr("class","td_bottom").append("span").html("-"); // this was active code
+								//tr.append("td").attr("class","td_bottom").append("span").text("-");
+							}						
+						   if(!check_error_available)
+						   {
+							if(typeof error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl'] == 'undefined')
+							{
+								title_val = "No Datapoint collected in this Time!";
+								error_table_string = error_table_string + '<td class="no_error"><div class="tooltip"><span class="tic_mark">⛒</span><div class="tooltiptext">'+title_val +'</div></div></td>';
+
+							}else{
+								title_val = "No Error";
+								error_table_string = error_table_string + '<td class="no_error"><div class="tooltip"><span class="tic_mark">☺</span><div class="tooltiptext">'+title_val +'</div></div></td>';
+							}	
+
+
+						   }
+                           //tr.append("td").append("span").text(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']);// show  sub avg 
+
+							if(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl'] <= 20)
+							{
+
+								//tr.append("td").attr("class","critical_alarm first_td td_bottom").append("span").text(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']);// show  sub avg availability
+                                sub_perc_table = '<tr><td colspan="'+element_err_counter+'" class="critical_alarm first_td td_bottom"><span>'+error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']+'</span></td></tr>';
+
+							}else if(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl'] > 20 && error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl'] <= 60 )
+							{
+								//tr.append("td").attr("class","warning_alarm first_td td_bottom").append("span").text(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']); // show sub avg availability
+                                sub_perc_table = '<tr><td colspan="'+element_err_counter+'" class="warning_alarm first_td td_bottom"><span>'+error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']+'</span></td></tr>';								
+
+							}
+							else
+							{					
+								//tr.append("td").attr("class","green_alarm first_td td_bottom").append("span").text(error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']); // show sub avg availability
+
+								sub_perc_table = '<tr><td colspan="'+element_err_counter+'" class="green_alarm first_td td_bottom"><span>'+( typeof error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl'] == 'undefined' ? '-':error_wrt_test[test_name][new Date(temp_time_interval[j])]['Avl']) +'</span></td></tr>';	
+							}
+
+
+						error_table_string = '<table width=100% cellspacing=0 cellpadding =0>'+ sub_perc_table  + error_table_string + "</tr></table>";
+						tr.append("td").attr("class","td_bottom").html(error_table_string);
+						//.attr("colspan",temp_error_type.length+1)
+						}	
+
+					counter++;
+
+						 if(counter > 12)
+						 {
+							var thead = table.append("thead");
+							var tr = thead.append("tr");
+
+							if (hasBreakdown1) {
+							   tr.append("th").attr("rowspan",2).attr("data-sort", "bd1").append("span").text(headers.breakdown1);
+							}
+							tr.append("th").attr('class','th_summary').attr("rowspan",2).append("span").text('Avail in '+ report_period + ' hour(s)');
+
+							for( i = temp_time_interval.length - 1 ; i >= 0 ; i-- )
+							{
+
+								display_dt = formatDate(new Date(temp_time_interval[i]));
+								// colspan include avl time for given interval	and other error column					
+								 tr.append("th").attr("class","first_td").attr("nowrap","nowrap").attr("data-sort", i).html(display_dt);
+                                 // .attr("colspan",temp_error_type.length + 2)
+							}
+
+							var tr = thead.append("tr");
+                            /*
+							for( j = temp_time_interval.length - 1 ; j >= 0 ; j-- )
+							{
+								 tr.append("th").attr("class","first_td").attr("rowspan",2).attr("data-sort", "bd1").append("span").attr('class','err_name_disp').text('Avail');
+								for( i = temp_error_type.length - 1 ; i >= 0 ; i-- )
+								{
+									 tr.append("th").append("span").attr('class','err_name_disp').text(temp_error_type[i]);
+
+								}
+								tr.append("th").attr("data-sort", "bd1").append("span").attr('class','err_name_disp').text('Other Errors');						
+							} 
+                             */
+							var tbody =  table.append("tbody"); 
+
+							 counter =1;
+						 }					 
+
+
+
+
+					}
+
+		 if(inIframe)
+          {
+			  setScroll();
+		  }			
+
+
+		}// end of else
+
+
+
+
+
+        });
+    </script>
+    <style type="text/css">
+        table.data-tbl th {
+            cursor: pointer;
+        }
+
+        table.data-tbl th > span {
+            padding-right: 10px;
+            background-repeat: no-repeat;
+            background-position: right center;
+        }
+
+        table.data-tbl tbody tr:hover {
+            background-color: #FEFBDF;
+        }
+		.critical_alarm{
+			/*background: #e0280b;*/
+
+			/*color: blanchedalmond;*/
+			font-weight: bold;
+			font-size: x-small;;
+            color:#670423
+
+		}
+
+		.warning_alarm{
+			/*background: #ffeba8;*/
+			font-weight: bold;
+			font-size: x-small;;
+            color:#8f9209;
+			/*color: #323232;*/
+
+		}
+
+		.green_alarm{
+
+			color: #045d0f;
+			font-weight: bold;
+			font-size: x-small;;
+
+		}
+
+		.first_td
+		{
+
+			    border-left-color: #f3ebeb !important;
+				border-left-style: solid !important;
+				border-left-width: thin !important;
+		}
+
+		.td_bottom{
+
+			border-bottom-color:  #f7f1f1 !important;
+			border-bottom-width: thin !important;
+			border-bottom-style: solid !important;
+		}
+		.tic_mark{
+
+			    font-size: large;
+		}
+		.no_error_display{
+
+			color: #308e0b;
+			font-size: x-large;
+		}
+		.err_name_disp{
+		    font-family: ‘Palatino Linotype’, ‘Book Antiqua’, Palatino, serif;
+			font-size: 10px
+		}
+
+		thead{
+			    padding: 15px;
+				color: #fff;
+				/*text-shadow: 1px 1px 1px #0b6cb3;*/
+				border: 1px solid #0b6cb3;
+				border-bottom: 3px solid #778ae6;
+				/*background-color: rgb(11, 108, 179);*/
+				/*background: -webkit-gradient( linear, left bottom, left top, color-stop(0.02, rgb(11, 108, 179)), color-stop(0.51, rgb(11, 108, 179)), color-stop(0.87, rgb(11, 108, 179)) );*/
+			    font-size: small;
+		}
+		tr:nth-child(even) {background-color: rgba(241, 241, 241, 0.47); font-size: smaller;}
+		tr:nth-child(odd) {font-size: smaller;}
+		.th_summary{
+			    width: 56px;
+		}
+		th{
+			    background: #0b6cb3;
+
+		}
+		.test_name{
+			font-family: Arial, Verdana, Tahoma, sans-serif;
+    /* line-height: 1.5; */
+    font-size: 12px;
+
+		}
+		th{
+
+			padding: 1px;
+			color:  #44222f;
+			/*text-shadow: 1px 1px 1px #0b6cb3;*/
+			/*
+			border: 1px solid #0b6cb3;
+			border-bottom: 3px solid #778ae6;
+			*/
+			background-color:  rgb(237, 237, 237);
+			font-size: small;
+			/*background: -webkit-gradient( linear, left bottom, left top, color-stop(0.02, rgb(89, 161, 214)), color-stop(0.51, rgb(27, 114, 178)), color-stop(0.87, rgb(50, 170, 241)) );*/
+			/* -webkit-border-top-left-radius: 5px; */
+			/* -webkit-border-top-right-radius: 5px; */
+			-moz-border-radius: 5px 5px 0px 0px;
+			border-top-left-radius: 5px;
+			border-top-right-radius: 5px;
+		}
+		td{
+			    text-align: center;
+		}
+
+		.tooltip {
+		position: relative;
+		display: inline-block;
+		border-bottom: 1px dotted black;
+	}
+
+	.tooltip .tooltiptext {
+		visibility: hidden;
+		width: 220px;
+		background-color: black;
+		color: #fff;
+		text-align: center;
+		border-radius: 6px;
+		padding: 5px 0;
+
+
+		/* Position the tooltip */
+		position: absolute;
+		z-index: 1;
+	}
+
+	.tooltip .tooltiptext_legend
+	{
+		visibility: hidden;
+		width: 450px;
+		background-color: black;
+		color: #fff;
+		text-align: center;
+		border-radius: 6px;
+		padding: 5px 0;
+
+
+		/* Position the tooltip */
+		position: absolute;
+		z-index: 8;
+	}
+
+	.tooltip:hover .tooltiptext_legend {
+		visibility: visible;
+		margin: 0px 0px 0px 0px;
+	}
+
+	.tooltip:hover .tooltiptext {
+		visibility: visible;
+		margin: 0px 0px 0px -58px;
+	}
+	.Tm-Out{
+	background-color: #B38FFA;
+	}
+
+	.DNS{
+		background-color:#e247e1;
+	}
+     .no_error{
+		background-color: #ffffff; 
+	 }
+	.JS{
+		background-color: #76DAF0;
+	}
+    .Conn{
+		background-color: #f9e20a;
+	}
+    .others_error{
+		background-color: #ea5e5e;
+	}
+    .SSL{
+		background-color:#FFA53A;
+	}
+	.Resp{
+		background-color:#080fe8;
+	}
+    .Test{
+		background-color:darkkhaki;
+	}
+	table.srch-mod-tbl th{
+		background-color: #101010;
+		color: #ffffff; !Important
+		padding: 0px 0px 5px 10px;
+		 border-top: solid 1px #EDEDED;
+     	border-right: solid 1px;
+	    border-left: solid 1px #EBEBEB;
+		font-weight: lighter;
+	}
+
+	table.srch-mod-tbl td {
+    padding: 0px 1px 2px;
+	}
+	span{
+		font-weight: bolder;
+	}
+    </style>
