@@ -1,0 +1,743 @@
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
+<script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/jquery.gridster/0.5.6/jquery.gridster.min.js'></script>
+<link rel='stylesheet' type='text/css' href='//cdnjs.cloudflare.com/ajax/libs/jquery.gridster/0.5.6/jquery.gridster.min.css'>
+
+<script type='text/javascript'>
+
+        /* Version 2.1 - 3 May 2016 */
+        /* ChangeLog */
+        /* Added SLA entry field to override average */
+        /* Removed settings from dashboard view */
+        /* Added small,medium,large widget selector */
+        document.addEventListener('DOMContentLoaded', function(event) {
+
+          /* Thresholds */
+          var t_availability = 98;
+          var t_metric_min = 4;
+          var t_metric_max = 7;
+          var t_metric_min_btc = 4;
+          var t_metric_max_btc = 7;
+		  var t_metric_min_wtm = 4;
+		  var t_metric_max_wtm = 4;
+          
+		  var t_grid_size = 80;
+		  
+		  var wtb_s = "1,2,3,4";
+		  var btc_s = "5,6,7";
+
+          var upChar = "&utrif;";
+          var downChar = "&dtrif;";
+          var selector = CPVisualization.getContainerSelector();
+          //var selector = "div#Chart2";
+           /*<select id="g_chart_type">' +
+              '<option value="line">Line</option>' +
+              '<option value="bar">Bar</option>' +
+              '</select>'*/
+          if (selector == "div#Chart2" || true) {
+            $(selector).html('<div class="g_chart_type">' +
+              ' Grid Size: <select id="g_grid_size">' +
+              '<option value="80">Small</option>' +
+              '<option value="100">Big</option>' +
+              '<!-- <option value="120">Large</option> -->' +
+              '</select>' +
+              ' Warning WTB : <input type="text" id="g_warning" name="g_warning" size="3"/>' +
+              ' Critcal WTB: <input type="text" id="g_critical" name="g_critical" size="3"/>' +
+			  ' Warning BTM: <input type="text" id="g_warning_btc" name="g_warning_btc" size="3"/>' +
+              ' Critcal BTM: <input type="text" id="g_critical_btc" name="g_critical_btc" size="3"/>' +
+			  ' Warning WTM: <input type="text" id="g_warning_wtm" name="g_warning_wtm" size="3"/>' +
+              ' Critcal WTM: <input type="text" id="g_critical_wtm" name="g_critical_wtm" size="3"/>' +
+			  ' WTB Steps : <input type="text" id="wtb_s" name="wtb_s" size="5" placeholder="1,2,3,4"/>' +
+			  ' BTM Steps : <input type="text" id="btc_s" name="btc_s" size="5" placeholder="5,6,7"/>' +
+              '</div><hr />');
+          }
+
+          $(function() {
+            $('#g_chart_type').change(function() {
+              localStorage.setItem('g_chart_type', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_chart_type')) {
+              $('#g_chart_type').val(localStorage.getItem('g_chart_type'));
+            } else {
+              localStorage.setItem('g_chart_type', 'line');
+            }
+
+            $('#g_grid_size').change(function() {
+              localStorage.setItem('g_grid_size', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_grid_size')) {
+              $('#g_grid_size').val(localStorage.getItem('g_grid_size'));
+            } else {
+              localStorage.setItem('g_grid_size', '80');
+            }
+
+            $('#g_sla').change(function() {
+              localStorage.setItem('g_sla', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_sla')) {
+              $('#g_sla').val(localStorage.getItem('g_sla'));
+              var g_sla = localStorage.getItem('g_sla');
+            } else {
+              localStorage.removeItem('g_sla');
+            }
+
+            $('#g_warning').change(function() {
+              localStorage.setItem('g_warning', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_warning')) {
+              $('#g_warning').val(localStorage.getItem('g_warning'));
+              t_metric_min = localStorage.getItem('g_warning');
+            } else {
+              localStorage.removeItem('g_warning');
+            }
+
+			$('#g_warning_btc').change(function() {
+              localStorage.setItem('g_warning_btc', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_warning_btc')) {
+              $('#g_warning_btc').val(localStorage.getItem('g_warning_btc'));
+              t_metric_min_btc = localStorage.getItem('g_warning_btc');
+            } else {
+              localStorage.removeItem('g_warning_btc');
+            }
+			
+			
+			$('#g_warning_wtm').change(function() {
+              localStorage.setItem('g_warning_wtm', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_warning_wtm')) {
+              $('#g_warning_wtm').val(localStorage.getItem('g_warning_wtm'));
+              t_metric_min_wtm = localStorage.getItem('g_warning_wtm');
+            } else {
+              localStorage.removeItem('g_warning_wtm');
+            }
+			
+            $('#g_critical').change(function() {
+              localStorage.setItem('g_critical', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_critical')) {
+              $('#g_critical').val(localStorage.getItem('g_critical'));
+              t_metric_max = localStorage.getItem('g_critical');
+            } else {
+              localStorage.removeItem('g_critical');
+            }
+			
+			
+			 $('#g_critical_btc').change(function() {
+              localStorage.setItem('g_critical_btc', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_critical_btc')) {
+              $('#g_critical_btc').val(localStorage.getItem('g_critical_btc'));
+              t_metric_max_btc = localStorage.getItem('g_critical_btc');
+            } else {
+              localStorage.removeItem('g_critical_btc');
+            }
+			
+			 $('#g_critical_wtm').change(function() {
+              localStorage.setItem('g_critical_wtm', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('g_critical_wtm')) {
+              $('#g_critical_wtm').val(localStorage.getItem('g_critical_wtm'));
+              t_metric_max_wtm = localStorage.getItem('g_critical_wtm');
+            } else {
+              localStorage.removeItem('g_critical_wtm');
+            }
+			
+			$('#wtb_s').change(function() {
+              localStorage.setItem('wtb_s', this.value);
+              location.reload();
+            });
+			
+			if (localStorage.getItem('wtb_s')) {
+              $('#wtb_s').val(localStorage.getItem('wtb_s'));
+              wtb_s = localStorage.getItem('wtb_s');
+            } else {
+              localStorage.removeItem('wtb_s');
+            }
+			
+			$('#btc_s').change(function() {
+              localStorage.setItem('btc_s', this.value);
+              location.reload();
+            });
+			
+			if (localStorage.getItem('btc_s')) {
+              $('#btc_s').val(localStorage.getItem('btc_s'));
+              btc_s = localStorage.getItem('btc_s');
+            } else {
+              localStorage.removeItem('btc_s');
+            }
+			
+          });
+
+          var g_size = parseInt(localStorage.getItem('g_grid_size'));
+          /* Get Catchpoint data */
+
+          var summary = CPVisualization.getSummaryData();
+          var chartData = CPVisualization.getData();
+          var data = summary.data;
+          var headers = summary.headers;
+          var metric_header_name = headers.metrics[0].trim();
+		  var is_ms = false;
+		  var is_byte = false;
+		  var is_avl = false;
+		  var is_dwn = false;
+		  var is_perc =  false;
+		  var is_count = false;
+		  var show_metric_symbol = '(s)';
+		  // check if metric is of type milliseconds
+		  var n = metric_header_name.indexOf("(ms)");
+		  
+		  if (n > -1)
+		  {
+			is_ms = true;
+            metric_header_name = metric_header_name.replace("(ms)","(s)")
+			metric_header_name = metric_header_name.substr(metric_header_name.indexOf(" ") + 1);
+			metric_header_name = metric_header_name.replace("Document Complete","Page Load Time");
+          }
+          if (metric_header_name.indexOf("Bytes") > -1)
+          {
+			 is_byte = true; 
+			 show_metric_symbol = '(B)';
+			  
+		  }
+          if(metric_header_name.indexOf("% Availability") > -1){
+			  is_avl = true;
+			  show_metric_symbol = '%';
+		  }	
+
+		  if(metric_header_name.indexOf("%") > -1){
+			  is_perc = true;
+			  show_metric_symbol = '%';
+		  }
+		  
+          if(metric_header_name.indexOf("#") > -1){
+			  is_count = true;
+			  show_metric_symbol = '#';
+		  }	  
+
+          var c_data = chartData.data;
+          var c_headers = chartData.headers;
+
+          $(selector).append("<div class='gridster'><ul></ul></div>");
+
+          var gridster = $(".gridster>ul").gridster({
+            widget_margins: [3, 3],
+            widget_base_dimensions: [g_size, g_size]
+          }).data('gridster').disable();
+          var re = /\[.*\]\s-/;
+          var total = 0;
+          test_list = {}
+          //console.log(data);
+		  var test_list = {};
+          var test_arr = [];  
+		  var regExp = /\[([^\]]+)/;
+		  var wtb =  wtb_s.split(','); 
+		  var btc =  btc_s.split(','); 
+		  for(var j=0; j< data.length ; j++)
+		  {
+			var obj = data[j];
+			var test_val = regExp.exec(obj.breakdown1);
+			var test_step_val  = regExp.exec(obj.breakdown2);
+			var test_step = test_step_val[1].trim();
+			var test_id = test_val[1].trim();
+			var metric = obj.metrics[0];
+			var test_name  = (obj.breakdown1.replace(re, "")).trim();
+			if(typeof test_list[test_id] == 'undefined')
+			{
+				test_arr.push(test_id);
+				test_list[test_id] = { }
+				test_list[test_id]['name'] = test_name;
+				test_list[test_id]['wtb_r'] = 0;
+				test_list[test_id]['wtb_rc'] = 0;
+				test_list[test_id]['btc_r'] = 0;
+				test_list[test_id]['btc_rc'] = 0;
+			}
+			
+			
+			var zone_decider = select_wtb_btc_zone(test_step,wtb,btc)
+			if(zone_decider[0]){
+				test_list[test_id]['wtb_r'] += parseFloat(metric);
+				test_list[test_id]['wtb_rc'] += 1;
+				
+			}
+			
+			if(zone_decider[1]){
+				test_list[test_id]['btc_r'] += parseFloat(metric);
+				test_list[test_id]['btc_rc'] += 1;
+				
+			}
+			
+		  }
+		  //console.log(test_list); 
+		  gridster.add_widget("<li class='default' id='wtb_header'>" +
+              "<div class='small-widget'>" +
+              "<h1 class='widget_size_" + g_size + "_hdr' >Website to Basket</h1>" +
+              "</div></li>", 2, 1);
+			  
+		  $('#wtb_header').attr({"data-col":1 , "data-row":1, "data-sizex":2, "data-sizey":1});
+		  
+		 gridster.add_widget("<li class='default' id='btc_header'>" +
+              "<div class='small-widget'>" +
+              "<h1 class='widget_size_" + g_size + "_hdr'>Basket To Money</h1>" +
+              "</div></li>", 2, 1);
+			  
+		  $('#btc_header').attr({"data-col":1 , "data-row":2, "data-sizex":2, "data-sizey":1});
+		  
+		  gridster.add_widget("<li class='default' id='wtm_header'>" +
+              "<div class='small-widget'>" +
+              "<h1 class='widget_size_" + g_size + "_hdr'>Website To Money</h1>" +
+              "</div></li>", 2, 1);
+			  
+		  $('#wtm_header').attr({"data-col":1 , "data-row":3, "data-sizex":2, "data-sizey":1});
+		  var wtb_col = 3;
+		  var wtb_row = 1;
+		  var btc_col = 3;
+		  var btc_row = 2;
+		  var wtm_row = 3;
+		  var wtm_col = 3;
+		  for (var i =0;i< test_arr.length;i++)
+		  {
+			var temp_obj = test_list[test_arr[i]];
+			var t_id = test_arr[i];
+			var wtb_id = "wtb"+t_id;
+			var btc_id = "btc"+t_id;
+			var wtm_id = "btm"+t_id;
+			var test_name  = temp_obj['name'];
+			var test_name_disp =  (test_name.length > 22)?test_name.substring(0,22)+ '...' : test_name;
+			if(temp_obj['wtb_rc'] == 0 || temp_obj['wtb_rc'] == 0)
+			{
+				continue;
+			}	
+			if (is_avl){
+			var calc_data_wtb  =  parseFloat(Math.round(temp_obj['wtb_r']/ temp_obj['wtb_rc'] * 100) / 100).toFixed(2);;
+			var calc_data_btc  =  parseFloat(Math.round(temp_obj['btc_r']/ temp_obj['btc_rc'] * 100) / 100).toFixed(2);;
+			var calc_data_wtm  =  parseFloat(Math.round((temp_obj['btc_r'] + temp_obj['wtb_r'])/(temp_obj['btc_rc'] + temp_obj['wtb_rc']) * 100) / 100).toFixed(2);;
+			}else{
+				
+				if(is_ms){
+				var calc_data_wtb  =   parseFloat(Math.round((temp_obj['wtb_r']/1000) * 100) / 100).toFixed(2);;
+				var calc_data_btc  =  parseFloat(Math.round((temp_obj['btc_r']/1000) * 100) / 100).toFixed(2);	
+				var calc_data_wtm  =  parseFloat(Math.round((temp_obj['btc_r'] + temp_obj['wtb_r'])/(1000) * 100) / 100).toFixed(2);;
+				}
+				
+				if(is_count)
+				{
+					var calc_data_wtb  =   parseFloat(Math.round((temp_obj['wtb_r']) * 100) / 100).toFixed(2);;
+					var calc_data_btc  =  parseFloat(Math.round((temp_obj['btc_r']) * 100) / 100).toFixed(2);
+					var calc_data_wtm  =  parseFloat(Math.round((temp_obj['btc_r'] + temp_obj['wtb_r']) * 100) / 100).toFixed(2);;					
+					
+				}
+				
+				if(is_byte)
+				{
+					var calc_data_wtb  =  parseFloat(Math.round((temp_obj['wtb_r']) * 100) / 100).toFixed(2);;
+					var calc_data_btc  =  parseFloat(Math.round((temp_obj['btc_r']) * 100) / 100).toFixed(2);
+					var calc_data_wtm  =  parseFloat(Math.round((temp_obj['btc_r'] + temp_obj['wtb_r']) * 100) / 100).toFixed(2);;					
+					
+				}
+				
+			}
+			
+			wc =  widgetColor(calc_data_wtb, metric_header_name,'wtb')
+			gridster.add_widget("<li class='" + wc + "' id='"+wtb_id+"' >" +
+              "<div class='small-widget'>" +
+              "<h2 class='widget_size_" + g_size + "'>"+test_name_disp+"</h2>" +
+              "<h1 class='widget_size_" + g_size + "'>"+ calc_data_wtb + show_metric_symbol +"</h1>" +
+              "</div></li>", 2, 1);
+			 $('#'+wtb_id).attr({"data-col":wtb_col , "data-row":wtb_row, "data-sizex":2, "data-sizey":1});
+			
+			wc =  widgetColor(calc_data_btc, metric_header_name,'btc')
+			gridster.add_widget("<li class='" + wc + "' id='"+btc_id+"' >" +
+              "<div class='small-widget'>" +
+              "<h2 class='widget_size_" + g_size + "'>"+test_name_disp+"</h2>" +
+              "<h1 class='widget_size_" + g_size + "'> "+ calc_data_btc + show_metric_symbol + "</h1>" +
+              "</div></li>", 2, 1);
+			
+			 $('#'+btc_id).attr({"data-col":btc_col , "data-row":btc_row, "data-sizex":2, "data-sizey":1});
+			 
+			 
+			wc =  widgetColor(calc_data_wtm, metric_header_name,'wtm')
+			gridster.add_widget("<li class='" + wc + "' id='"+wtm_id+"' >" +
+              "<div class='small-widget'>" +
+              "<h2 class='widget_size_" + g_size + "'>"+test_name_disp+"</h2>" +
+              "<h1 class='widget_size_" + g_size + "'> "+ calc_data_wtm + show_metric_symbol + "</h1>" +
+              "</div></li>", 2, 1);
+			
+			 $('#'+wtm_id).attr({"data-col":wtm_col , "data-row":wtm_row, "data-sizex":2, "data-sizey":1});
+			 
+			 btc_col += 2;
+			 wtb_col += 2;
+			 wtm_col += 2;
+		  }  
+		  
+		  
+		  
+		  /*for (var i = 0; i < data.length; i++) {
+            var obj = data[i];
+			var regExp = /\[([^\]]+)/;
+			var val_arr = regExp.exec(obj.breakdown2);
+			var val_test = regExp.exec(obj.breakdown1);
+			//console.log(val_arr[1]);
+			//console.log(val_test[1]);
+			var test_name  = (obj.breakdown1.replace(re, "")).trim();
+			test_list[test_name] = i;
+            var metric = obj.metrics[0];
+			if(is_ms)
+			{
+			  metric =  parseInt(metric)/1000;
+            }
+
+            total += parseFloat(metric);
+          }
+          //console.log(test_list); 
+          arr_test = [];
+          for( var ky in test_list)
+		  {
+			  arr_test.push(ky);
+		  }
+          //console.log(arr_test);		  
+          arr_test.sort();
+		  //console.log(arr_test);
+         		  
+         */
+
+
+		  /*var avg = 1;
+		  var wc = "ok";
+		  
+		   gridster.add_widget("<li class='" + wc + "'>" +
+              "<div class='small-widget'>" +
+              "<h2 class='widget_size_" + g_size + "'>Website to Basket</h2>" +
+              "<h1 class='widget_size_" + g_size + "'> </h1>" +
+              "</div></li>", 2, 1);
+			 wc = "warning"; 
+			gridster.add_widget("<li class='" + wc + "'>" +
+              "<div class='small-widget'>" +
+              "<h2 class='widget_size_" + g_size + "'>Basket to Cash</h2>" +
+              "<h1 class='widget_size_" + g_size + "'> </h1>" +
+              "</div></li>", 2, 1);
+		  */
+          
+			
+           // var wc = widgetColor(metric, headers.metrics[0], avg);
+
+            /*gridster.add_widget("<li class='" + wc + "'>" +
+              "<div class='small-widget'>" +
+              "<h2 class='widget_size_" + g_size + "'>" + text + "</h2>" +
+              "<h1 class='widget_size_" + g_size + "'>" + metric + "" + showPercent + "</h1>" +
+              "</div></li>", 2, 1);*/
+			  
+			/*
+			 gridster.add_widget("<li class='" + wc + "'>" +
+              "<div class='small-widget'>" +
+              "<h2 class='widget_size_" + g_size + "'>" + text + "</h2>" +
+              "<h1 class='widget_size_" + g_size + "'>" + metric + "" + showPercent + "</h1>" +
+              "<span class='inlinesparkline'>" + arr[i][2] + "</span></div></li>", 2, 1);
+			
+			*/  
+			  
+          function select_wtb_btc_zone(step,wtb,btc){
+			  var is_wtb = false;
+			  var is_btc = false;
+			  for(var k =0 ;k< wtb.length ;k++)
+			  {
+				if(parseInt(wtb[k]) == parseInt(step))
+				{
+				  	is_wtb = true;
+				}
+				
+			  }
+             if(!is_wtb){
+				for(var m =0 ;m< btc.length ;m++)
+				  {
+					if(parseInt(btc[m]) == parseInt(step))
+					{
+						is_btc = true;
+					}
+					
+				  }
+			 
+			}  
+			  
+			  return [is_wtb,is_btc];
+		  }
+		
+          function widgetColor(data, type,zone) {
+            
+			var availColor = "ok";
+            
+			if(zone == 'btc')
+			{
+				if (type == '% Availability') {
+					//console.log("under aval");
+				  if (data == 100) {
+					availColor = 'ok';
+				  } else if (data <= t_metric_min_btc && data > t_metric_max_btc) {
+					availColor = 'warning';
+				  } else if (data <= t_metric_max_btc) {
+					availColor = 'critical';
+				  }
+				} else {
+				  if (parseInt(data) < parseInt(t_metric_min_btc)){
+					  availColor = 'ok';
+				  }
+				  else if ( parseInt(data) < parseInt(t_metric_max_btc))
+				  {
+					  availColor = 'warning';
+				  }
+				  else{
+					  availColor = 'critical';
+				  }
+				}
+				
+			}
+			else if(zone == 'wtm')
+			{
+				if (type == '% Availability') {
+					//console.log("under aval");
+				  if (data == 100) {
+					availColor = 'ok';
+				  } else if (data <= t_metric_min_wtm && data > t_metric_max_wtm) {
+					availColor = 'warning';
+				  } else if (data <= t_metric_max_wtm) {
+					availColor = 'critical';
+				  }
+				} else {
+				  if (parseInt(data) < parseInt(t_metric_min_wtm)){
+					  availColor = 'ok';
+				  }
+				  else if ( parseInt(data) < parseInt(t_metric_max_wtm))
+				  {
+					  availColor = 'warning';
+				  }
+				  else{
+					  availColor = 'critical';
+				  }
+				}
+				
+			}
+			else	
+			{
+				if (type == '% Availability') {
+					//console.log("under aval");
+				  if (data == 100) {
+					availColor = 'ok';
+				  } else if (data <= t_metric_min && data > t_metric_max) {
+					availColor = 'warning';
+				  } else if (data <= t_metric_max) {
+					availColor = 'critical';
+				  }
+				} else {
+				  if (parseInt(data) < parseInt(t_metric_min)){
+					  availColor = 'ok';
+				  }
+				  else if ( parseInt(data) < parseInt(t_metric_max))
+				  {
+					  availColor = 'warning';
+				  }
+				  else{
+					  availColor = 'critical';
+				  }
+				}
+			
+			}
+			
+			
+			
+            return availColor;
+          }
+        });
+    </script>
+    <style>
+        .gridster * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #fff;
+        }
+
+        .gridster ul {
+            list-style-type: none;
+        }
+
+        .gridster li {
+            font-size: 1em;
+            font-weight: 700;
+            text-align: center;
+            line-height: 100%;
+        }
+
+        .gridster {
+            margin: 0 auto;
+        }
+
+        .gridster .gs-w {
+            background: #DDD;
+            cursor: pointer;
+            z-index: 2;
+            position: absolute;
+        }
+
+        .gridster .player {
+            background: #BBB;
+        }
+
+        .gridster .preview-holder {
+            border: none !important;
+            background: grey !important;
+        }
+
+        .gridster .player-revert {
+            z-index: 10 !important;
+            -webkit-transition: left .3s, top .3s !important;
+            -moz-transition: left .3s, top .3s !important;
+            -o-transition: left .3s, top .3s !important;
+            transition: left .3s, top .3s !important;
+        }
+
+        .gridster .critical {
+            background-color: #F44336;
+        }
+
+        .gridster .ok {
+            background-color: #8BC34A;
+        }
+
+        .gridster .warning {
+            background-color: #FF9800;
+        }
+
+        .gridster .default {
+            background-color: #4b4b4b;
+        }
+
+        .gridster h2 {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .gridster h2.widget_size_80 {
+          font-size: 12px;
+          line-height: 14px;
+		  padding: 21px 0 0 0;
+        }
+
+        .gridster h2.widget_size_100 {
+            font-size: 16px;
+			line-height: 22px;
+			padding: 30px 0 0 0;
+        }
+
+        .gridster h2.widget_size_120 {
+          font-size: 20px;
+          line-height: 26px;
+        }
+
+        .gridster .widgetText {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            line-height: 14px;
+            font-weight: 400;
+        }
+
+        .gridster h1 {
+            color: rgba(255, 255, 255);
+        }
+
+        .gridster h1.widget_size_80 {
+          font-size: 18px;
+		line-height: 30px;
+		    padding: 0px 0 0 0;
+			}
+
+		.gridster h1.widget_size_80_hdr {
+          font-size: 18px;
+		line-height: 30px;
+		padding: 11px 0 0 0;
+			}
+        .gridster h1.widget_size_100 {
+          font-size: 25px;
+          line-height: 35px;
+		  
+        }
+		
+		.gridster h1.widget_size_100_hdr {
+          font-size: 27px;
+          line-height: 35px;
+		  padding: 10px 0 0 0 ;
+		  
+        }
+
+        .gridster h1.widget_size_120 {
+          font-size: 28px;
+          line-height: 40px;
+        }
+
+        .gridster .large_80 {
+            color: rgba(255, 255, 255);
+            font-size: 40px;
+            line-height: 80px;
+        }
+
+        .gridster .large_100 {
+            color: rgba(255, 255, 255);
+            font-size: 50px;
+            line-height: 100px;
+        }
+
+        .gridster .large_120 {
+            color: rgba(255, 255, 255);
+            font-size: 60px;
+            line-height: 120px;
+        }
+
+        div .big-widget {
+            padding-top: 28px;
+            text-align: center;
+            width: 100%;
+        }
+
+        div .small-widget {
+            padding: 5px 0 0 0px;
+            text-align: center;
+            width: 100%;
+        }
+
+        div .g_chart_type {
+            padding: 5px;
+			background-color: black;
+			color: azure;
+			font-family: Arial, Verdana, Tahoma, sans-serif;
+			font-size: 11px;
+        }
+
+        .gridster .small {
+            font-size: 14px;
+        }
+
+        div .g_chart_type select,
+        div .g_chart_type input {
+            vertical-align: middle;
+        }
+
+        .inlinesparkline {
+          position: absolute;
+          bottom: 5px;
+}
+</style>
