@@ -1,0 +1,301 @@
+<script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js'> </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.13/moment-timezone-with-data.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/moment-range/2.2.0/moment-range.min.js'></script>
+<script type='text/javascript'>
+document.addEventListener('DOMContentLoaded', function(event) {
+    var selector = CPVisualization.getContainerSelector();
+    var summary = CPVisualization.getSummaryData();
+	var visualization = CPVisualization.getData();
+    var headerss = summary.headers.metrics;
+	//console.log(headerss);
+	//console.log(visualization);
+	
+	function checkDateBelongTo(dtval){
+		var current_time_zone = moment.tz.guess();
+		//console.log(current_time_zone);
+		var la = moment.tz(dtval,"MM/DD/YYYY hh:mm:ss A", "America/Los_Angeles");
+		console.log(la.format());
+		console.log(dtval);
+		
+		var endDate_local = moment.tz(new Date(), current_time_zone);
+		//console.log(endDate_local);
+		var endDate_et  =  endDate_local.clone().tz("America/Los_Angeles");
+		
+
+		// last 15 minutes
+		var endDate =  moment(endDate_et.format(),'YYYY-MM-DD hh:mm:ss')
+				, startDate   = moment(endDate_et.format(), 'YYYY-MM-DD hh:mm:ss').subtract(900, 'seconds')
+				, date  = moment(la.format(),'YYYY-MM-DD hh:mm:ss A')
+				, range_current_15_min = moment().range(startDate, endDate);
+		
+		// last 1 hour
+		var endDate_prevhour =   moment(endDate_et.format(),'YYYY-MM-DD hh:mm:ss')
+				/*var endDate = moment(moment.tz(new Date(nowDate.getFullYear(),nowDate.getMonth(),nowDate.getDate()), "America/New_York"),'YYYY-MM-DD')*/
+				, startDate_prevhour   = moment(endDate_et.format(),'YYYY-MM-DD hh:mm:ss').subtract(3600, 'seconds')
+				, range_lasthour = moment().range(startDate_prevhour, endDate_prevhour);
+				
+		console.log(range_current_15_min.contains(date));
+		console.log(range_lasthour.contains(date));
+	   return [range_current_15_min.contains(date),range_lasthour.contains(date)]
+	}
+	
+    
+    if(headerss[0]!=" # Runs" && headerss[1]!=" # Test Errors" && headerss[2]!=" # DNS Failures" && headerss[3]!=" # Connection Failures" && headerss[4]!=" # SSL Failures" && headerss[5]!=" # Response Failures" && headerss[6]!=" # Timeout Failures") {
+        d3.select(selector).append("table").attr("id", "values");
+        document.getElementById("values").innerHTML = "Please select '# Runs' and '# Test Errors' as metrics";
+    }
+    else{
+    
+	
+	
+	   $(selector).html('<div class="g_chart_type"> ' +
+              ' SLA 15 min: <input type="text" id="avl_sla_15_min" name="avl_sla_15_min" size="6"/>' +
+			  ' SLA 60 min: <input type="text" id="avl_sla_60_min" name="avl_sla_60_min" size="6"/>' +
+              '</div><hr />');
+
+       $(function() {
+         $('#avl_sla_15_min').change(function() {
+              localStorage.setItem('avl_sla_15_min', this.value);
+              location.reload();
+            });
+			
+			$('#avl_sla_60_min').change(function() {
+              localStorage.setItem('avl_sla_60_min', this.value);
+              location.reload();
+            });
+
+            if (localStorage.getItem('avl_sla_15_min')) {
+              $('#avl_sla_15_min').val(localStorage.getItem('avl_sla_15_min'));
+              var custom_sla_15_min = localStorage.getItem('avl_sla_15_min');
+            } else {
+              localStorage.removeItem('avl_sla_15_min');
+            }
+			
+			
+			if (localStorage.getItem('avl_sla_60_min')) {
+              $('#avl_sla_60_min').val(localStorage.getItem('avl_sla_60_min'));
+              var custom_sla_60_min = localStorage.getItem('avl_sla_60_min');
+            } else {
+              localStorage.removeItem('avl_sla_15_min');
+            }
+	   }); 
+        
+		
+		if (!localStorage.getItem('avl_sla_15_min')) {
+            var custom_sla_15_min = 0;
+          } else {
+            var custom_sla_15_min = parseInt(localStorage.getItem('avl_sla_15_min'));
+          }
+		  
+		if (!localStorage.getItem('avl_sla_60_min')) {
+            var custom_sla_60_min = 90;
+          } else {
+            var custom_sla_60_min = parseInt(localStorage.getItem('avl_sla_60_min'));
+          }
+        var testLength = summary.data.length;
+		var testDetailLength = visualization.data.length;
+		//console.log(testLength);
+		//console.log("-------");
+   
+        var splitCount = 0;
+        var rowI = 0;
+		var parent_container = {};
+		var test_list = {};
+		for(var j=0;j<testDetailLength;j++)
+		{
+			temp_test_name =  visualization.data[j].breakdown1;
+			dim_val  = visualization.data[j].dimension;
+			temp_metrics =  visualization.data[j].metrics;
+			chk_pt = checkDateBelongTo(dim_val);
+			temp_test_run =  temp_metrics[0];
+			temp_erro_count =  (temp_metrics[1] ? temp_metrics[1] : 0)  + (temp_metrics[2] ? temp_metrics[2] : 0) + (temp_metrics[3] ? temp_metrics[3] : 0) + (temp_metrics[4] ? temp_metrics[4] : 0)+ (temp_metrics[5] ? temp_metrics[5] : 0) + (temp_metrics[6] ? temp_metrics[6] : 0);
+			test_list[temp_test_name] = temp_test_name;
+			// fifteen minute data capture
+			if(chk_pt[0] == true)
+			{
+				if( typeof parent_container[temp_test_name] == 'undefined')
+				{
+					parent_container[temp_test_name] = {};
+					parent_container[temp_test_name]['15_mins'] = {};
+					parent_container[temp_test_name]['60_mins'] = {};
+					parent_container[temp_test_name]['15_mins']['runs'] = temp_test_run;
+					parent_container[temp_test_name]['15_mins']['failure'] = temp_erro_count;
+					parent_container[temp_test_name]['60_mins']['runs'] = 0;
+					parent_container[temp_test_name]['60_mins']['failure'] = 0;
+				}
+				else
+				{
+					
+					parent_container[temp_test_name]['15_mins']['runs'] += temp_test_run;
+					parent_container[temp_test_name]['15_mins']['failure'] += temp_erro_count;
+				}	
+				
+				
+			}
+			
+			// last 1 hour data capture
+			if(chk_pt[1] == true)
+			{
+				if( typeof parent_container[temp_test_name] == 'undefined')
+				{
+					parent_container[temp_test_name] = {};
+					parent_container[temp_test_name]['15_mins'] = {};
+					parent_container[temp_test_name]['60_mins'] = {};
+					parent_container[temp_test_name]['60_mins']['runs'] = temp_test_run;
+					parent_container[temp_test_name]['60_mins']['failure'] = temp_erro_count;
+					parent_container[temp_test_name]['15_mins']['runs'] = 0;
+					parent_container[temp_test_name]['15_mins']['failure'] = 0;
+				}
+				else
+				{
+					parent_container[temp_test_name]['60_mins']['runs'] += temp_test_run;
+					parent_container[temp_test_name]['60_mins']['failure'] += temp_erro_count;
+				}	
+				
+				
+			}
+
+			
+		}
+
+         var test_level_info = {}
+        console.log(parent_container);
+		var test_arr = []; 
+        for (var key in test_list) {
+			
+			test_arr.push(key);
+			console.log(key);
+			console.log( 'availability 5 mins'  + ((parent_container[key]['15_mins']['runs'] -parent_container[key]['15_mins']['failure'])/parent_container[key]['15_mins']['runs'])*100 );
+			console.log( 'availability 60 mins'  + ((parent_container[key]['60_mins']['runs'] -parent_container[key]['60_mins']['failure'])/parent_container[key]['60_mins']['runs'])*100 );
+			
+			
+		}
+		test_arr.sort(function(a, b){
+		  // ASC  -> a.length - b.length
+		  // DESC -> b.length - a.length
+		  return b.length - a.length;
+		});
+		// 15 minute section
+        {
+			d3.select(selector).append("div").attr("id", "title").attr("class", "header");
+			document.getElementById("title").innerHTML = "Health Status";
+			var testLength = summary.data.length;
+			//console.log(testLength);
+			//console.log("-------");
+			//d3.select(selector).append("table").attr("id", "values").attr("class", "table1");
+			//d3.select(values).append("tr").attr("class", "subHeader").attr("height", "50");
+			//document.getElementsByClassName("subHeader")[0].innerHTML = "Now";
+			var splitCount = 0;
+			var rowI = 0;
+			var i = 0;
+			var tr_val  = d3.select(selector).append("DIV").attr("class", "table1");;
+			for (j=0;j< test_arr.length;j++) {
+		    key = test_arr[j];
+			var temp_avl_15_min =  ((parent_container[key]['15_mins']['runs'] -parent_container[key]['15_mins']['failure'])/parent_container[key]['15_mins']['runs'])*100;   
+			var temp_avl_60_min =  ((parent_container[key]['60_mins']['runs'] -parent_container[key]['60_mins']['failure'])/parent_container[key]['60_mins']['runs'])*100; 
+			{
+				console.log(key);
+				tr_val.append("div").attr("class", "column");
+				var ele = document.getElementsByClassName("column")[i];
+				ele.innerHTML = key;
+				
+				if(temp_avl_15_min <= custom_sla_15_min ){
+					ele.setAttribute("class", "column red");
+				}
+				else if( temp_avl_60_min <=  custom_sla_60_min ){
+					ele.setAttribute("class", "column yellow");
+				}else{
+					ele.setAttribute("class", "column green");
+					
+				}
+			}
+				
+			
+			i++;	
+			}
+		}	
+
+	
+	
+
+
+		
+
+		
+		
+		
+       
+        //console.log(JSON.stringify(summary));
+    }
+});
+
+</script>
+<style>
+    .row{
+       font-size: 15px;
+       padding: 20px;
+    }
+    .green{
+        font-size: 15px;
+		color: green;
+		padding: 0 0 10px 10px;
+		width: 320px;
+		float: left;
+		
+    }
+	.yellow{
+        font-size: 15px;
+        color: orange;
+        padding: 0 0 10px 10px;
+		width: 320px;
+		float: left;
+    }
+    .red{
+        font-size: 15px;
+        color: red;
+        padding: 0 0 10px 10px;
+		width: 320px;
+		float: left;
+    }
+    .table1{
+        width: 1370px;
+    /* float: left; */
+    position: relative;
+        
+    }
+    .header{
+        font-size: 30px;
+        padding: 15px 0 50px 0;
+        text-align: center;
+        color: #266bb4;
+    }
+    .row1{
+       font-size: 15px;
+       padding: 20px;
+    }
+    .green1{
+        font-size: 15px;
+        color: green;
+        padding: 0 0 10px 10px;
+    }
+    .red1{
+        font-size: 15px;
+        color: red;
+        padding: 0 0 10px 10px;
+    }
+    .table2{
+        width:50%;
+        float:right;
+        border-left: solid 2px #276ab5;
+    }
+    .subHeader{
+        font-size: 20px;
+        padding: 0 0 20px 0;
+        text-align: right;
+        color: #266bb4;
+    }
+	.g_chart_type{
+		    text-align: right;
+	}
+    
+</style>
