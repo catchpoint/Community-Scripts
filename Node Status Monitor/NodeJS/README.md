@@ -1,4 +1,4 @@
-Node Status Monitor
+Node Status Monitor (NodeJS)
 ===================
 
 This document provides instructions for installing and using the NodeJS version of Catchpoint's Node Status Monitor. For general information about Node Status Monitor, see the main [README](https://github.com/Schultztw/Community-Scripts/blob/June2021_NodeStatusMonitor/Node%20Status%20Monitor/README.md).
@@ -6,22 +6,22 @@ This document provides instructions for installing and using the NodeJS version 
 Prerequisites
 -------------------------------
 
-1. NodeJs - 14.17.0 +  [ [Download NodeJs](https://nodejs.org/en/download/) ]
-2. npm    - 6.14.13 +
+1. NodeJs 14.17.0+  [Download NodeJs](https://nodejs.org/en/download/)
+2. npm 6.14.13+
 
 Installation
 ------------
 
-1. Copy this folder (/NodeJS) and all of its contents to the machine that you want to run the Node Status Monitor.
-2. Run 'npm install' in the package directory (/NodeJS).
+1. Copy this folder `/NodeJS` and all of its contents to the machine that you want to run the Node Status Monitor.
+2. Run 'npm install' in the package directory `/NodeJS`.
 
 Credentials
 -----------
 
-To retrieve data from Catchpoint's REST API, you must first add your Key and Secret to the /config/config.js file.
+To retrieve data from Catchpoint's REST API, you must first add your Key and Secret to the `/config/config.js` file.
 
 1. Find your Key and Secret in the [Catchpoint Portal](https://portal.catchpoint.com/ui/Content/Administration/ApiDetail.aspx).
-2. Copy your Key and Secret to the respective mappings within /config/config.cfg:
+2. Copy your Key and Secret to the respective mappings within `/config/config.cfg`:
   
 ```  
 1  var config = {
@@ -32,12 +32,12 @@ To retrieve data from Catchpoint's REST API, you must first add your Key and Sec
 How To Run
 -----------
 
-1. Run 'npm start' in the package directory
+1. Run `npm start` in the package directory
 
 or
 
-1. npm install
-2. node node_monitor.js
+1. `npm install`
+2. `node node_monitor.js`
 
 File Structure [Before Execution]
 -----------------------------------
@@ -86,12 +86,12 @@ NodeJs/
 Output
 -------
 
-* **/nodeData/new_node_data.json**    : Contains Node status from the current run in JSON format
-* **/nodeData/old_node_data.json**    : Contains Node status from the previous run in JSON format
-* **/nodeData/result.json**           : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
+* **`/nodeData/new_node_data.json`**    : Contains Node status from the current run in JSON format
+* **`/nodeData/old_node_data.json`**    : Contains Node status from the previous run in JSON format
+* **`/nodeData/result.json`**           : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
 
 Note
 -----
-* result.json will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
+* `/nodeData/result.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
 
 
