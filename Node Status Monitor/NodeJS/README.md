@@ -12,9 +12,8 @@ Prerequisites
 Installation
 ------------
 
-Copy this folder (/NodeJS) and all of its contents to the machine that you want to run the Node Status Monitor.
-
-Run 'npm install' in the package directory (/NodeJS).
+1. Copy this folder (/NodeJS) and all of its contents to the machine that you want to run the Node Status Monitor.
+2. Run 'npm install' in the package directory (/NodeJS).
 
 Credentials
 -----------
