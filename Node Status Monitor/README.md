@@ -16,9 +16,9 @@ Node Status Monitor is a stand-alone program provided in three different version
 This document summarizes the design and functionality of the Node Status Monitor. For detailed installation and usage instructions specific to each language,
 see the READMEs in each subfolder:
 
-- [node.js readme](https://github.com/catchpoint/Community-Scripts/blob/June2021_NodeStatusMonitor/Node%20Status%20Monitor/NodeJS/README.md)
-- [python 2.7 readme](https://github.com/catchpoint/Community-Scripts/blob/June2021_NodeStatusMonitor/Node%20Status%20Monitor/Python%20v2.7/README.md)
-- [python (3.x) readme](https://github.com/catchpoint/Community-Scripts/blob/June2021_NodeStatusMonitor/Node%20Status%20Monitor/Python/README.md)
+- [node.js README](https://github.com/catchpoint/Community-Scripts/blob/June2021_NodeStatusMonitor/Node%20Status%20Monitor/NodeJS/README.md)
+- [python 2.7 README](https://github.com/catchpoint/Community-Scripts/blob/June2021_NodeStatusMonitor/Node%20Status%20Monitor/Python%20v2.7/README.md)
+- [python (3.x) README](https://github.com/catchpoint/Community-Scripts/blob/June2021_NodeStatusMonitor/Node%20Status%20Monitor/Python/README.md)
 
 Architecture
 ------------------
