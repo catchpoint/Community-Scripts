@@ -4,10 +4,10 @@ Node Status Monitor
 The Node Status Monitor uses Catchpoint's REST API to check the status of all Synthetic Test Nodes you have targeted in your test configurations. This enables you to easily
 stay up to date with any status changes that might impact your monitoring.
 
-Each time the Node Status Monitor runs, it retrieves the current status (active or inactive) for each Node. It compares this to the Node's prior status,
+Each time the Node Status Monitor runs, it retrieves the current status (active or inactive) of each Node. It compares this to the Node's prior status,
 thereby indicating which Nodes have changed status since the previous run.
 
-Node Status Monitor is a stand-alone program provided in three different versions based on the scripting language used:
+Node Status Monitor is a stand-alone program, provided in three different versions based on the scripting language used:
 
 - node.js
 - python 2.7
@@ -25,6 +25,9 @@ Architecture
 
 ![image](https://vizlibs.catchpoint.com/icons/node_status_arch.png)
 
+Logic
+------------------
+Each time Node Status Monitor runs, it calls Catchpoint's REST API and pulls the current status of each node that is targeted by any of your Synthetic Tests. It copies the results to 
 
 Output
 ------------------
