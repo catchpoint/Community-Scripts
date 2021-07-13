@@ -87,9 +87,9 @@ NodeJs/
 Output
 -------
 
-* new_node_data.json    : Contains Node status from the current run in JSON format
-* old_node_data.json    : Contains Node status from the previous run in JSON format
-* result.json           : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
+* /nodeData/new_node_data.json    : Contains Node status from the current run in JSON format
+* /nodeData/old_node_data.json    : Contains Node status from the previous run in JSON format
+* /nodeData/result.json           : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
 
 Note
 -----
