@@ -39,6 +39,11 @@ How To Run
 
 * python node_details.py
 
+How To Run Unit Test Cases
+--------------------------
+
+* python test_node_monitor.py
+
 File Structure [Before Execution]
 -----------------------------------
 
@@ -48,7 +53,8 @@ Python/
 ├── api_helper.py             ## Contains APIs related to authentication
 ├── config.cfg                ## Configuration file
 ├── process_data.py           ## Code for data transformation
-└── node_details.py           ## Main file
+├── node_details.py           ## Main file
+└── test_node_monitor.py      ## Unit testing main file
 ```
 
 File Structure [After Execution]
@@ -63,7 +69,8 @@ Python/
 ├── old_node_data.json        ## Output file - contains Node status from the previous run in JSON format
 ├── result.json               ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
 ├── process_data.py           ## Code for data transformation
-└── node_details.py           ## Main file
+├── node_details.py           ## Main file
+└── test_node_monitor.py      ## Unit testing main file
 ```
 
 

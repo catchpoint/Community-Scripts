@@ -39,6 +39,12 @@ or
 1. `npm install`
 2. `node node_monitor.js`
 
+How to Run Unit Test Cases
+--------------------------
+
+1. Run `npm test` in the package directory 
+
+
 File Structure [Before Execution]
 -----------------------------------
 
@@ -52,10 +58,12 @@ NodeJs/
 | ├── info
 | ├── error
 ├── nodeData
+├── test
+| ├── test.js             ## Unit test main file
 ├── utils
 | ├── logger.js           ## Logger utility
 ├──package.json           ## Project dependencies
-└── node_monitor.js        ## Main file
+└── node_monitor.js       ## Main file
 ```
 
 File Structure [After Execution]
@@ -76,6 +84,8 @@ NodeJs/
 | ├── new_node_data.json    ## Output file - contains Node status from the current run in JSON format
 | ├── old_node_data.json    ## Output file - contains Node status from the previous run in JSON format
 | ├── result.json         ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
+├── test
+| ├── test.js             ## contains unit test cases 
 ├── utils
 | ├── logger.js           ## logger utility
 ├──package.json           ## project dependencies
