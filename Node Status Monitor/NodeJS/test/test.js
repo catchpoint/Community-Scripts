@@ -1,6 +1,7 @@
+// dependent packages and files required
 import { expect } from 'chai';
 import fs from 'fs';
-import { process_node_status,write_data,compare_data,read_old_data,fetch_Data } from '../node_monitor.js';
+import { process_node_status,write_data,compare_data} from '../node_monitor.js';
 import {get_token} from '../api/auth.js';
 import config from '../config/config.js';
 let client_key = config.client_key;
@@ -8,8 +9,8 @@ let client_secret = config.client_secret;
 
 
 // test function to check generation of token
-describe('test_gen_token', ()=>{
-    it('test_gen_token', async()=>{
+describe('test_get_token', ()=>{
+    it('test_get_token', async()=>{
         const token = await get_token(client_key, client_secret);
         expect(token).to.not.be.undefined;
     });

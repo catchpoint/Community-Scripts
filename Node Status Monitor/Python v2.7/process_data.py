@@ -8,6 +8,3 @@ def process_node_details(node_details):
                                  "status": node_details['items'][i]['status']['name'],
                                  "network_type": node_details['items'][i]['network_type']['name']})
     return node_objects
-
-
-

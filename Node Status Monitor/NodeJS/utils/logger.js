@@ -1,6 +1,7 @@
-
+// dependent packages / files required for project
 import bunyan from 'bunyan';
 import RotatingFileStream from 'bunyan-rotating-file-stream';
+
 // Logger,for Error and info Logging
 var log = bunyan.createLogger({
   serializers: bunyan.stdSerializers,
@@ -30,4 +31,5 @@ var log = bunyan.createLogger({
     })
   }]
 });
+
 export default log;

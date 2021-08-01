@@ -42,19 +42,24 @@ How To Run
 How To Run Unit Test Cases
 --------------------------
 
-* python test_node_monitor.py
+* test folder being working directory
+* Run python test_node_monitor.py
 
 File Structure [Before Execution]
 -----------------------------------
 
 ```
 Python v2.7/
-├── app.log                   ## Contains application logs
-├── api_helper.py             ## Contains APIs related to authentication
-├── config.cfg                ## Configuration file
-├── process_data.py           ## Code for data transformation
-├── node_details.py           ## Main file
-└── test_node_monitor.py      ## Unit testing main file
+├── logs
+| ├──app.log                   ## Contains application logs
+├── api
+| ├──api_helper.py             ## Contains APIs related to authentication
+├── config.cfg                 ## Configuration file
+├── nodeData
+├── process_data.py            ## Code for data transformation
+├── node_details.py            ## Main file
+├── test
+└ └── test_node_monitor.py       ## Unit testing main file
 ```
 
 File Structure [After Execution]
@@ -62,15 +67,19 @@ File Structure [After Execution]
 
 ```
 Python v2.7/
-├── app.log                   ## Contains application logs
-├── api_helper.py             ## Contains APIs related to authentication
-├── config.cfg                ## Configuration file
-├── new_node_data.json        ## Output file - contains Node status from the current run in JSON format
-├── old_node_data.json        ## Output file - contains Node status from the previous run in JSON format
-├── result.json               ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
-├── process_data.py           ## Code for data transformation
-├── node_details.py           ## Main file
-└── test_node_monitor.py      ## Unit testing main file
+├── logs
+| ├──app.log                   ## Contains application logs
+├── api
+| ├──api_helper.py             ## Contains APIs related to authentication
+├── config.cfg                 ## Configuration file
+├── nodeData
+| ├──new_node_data.json        ## Output file - contains Node status from the current run in JSON format
+| ├──old_node_data.json        ## Output file - contains Node status from the previous run in JSON format
+| ├──result.json               ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
+├── process_data.py            ## Code for data transformation
+├── node_details.py            ## Main file
+├── test
+└ └── test_node_monitor.py       ## Unit testing main file
 ```
 
 Output

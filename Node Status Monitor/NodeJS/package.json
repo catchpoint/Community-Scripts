@@ -1,14 +1,14 @@
 {
-  "name": "node_runs",
+  "name": "catchpoint_node_runs",
   "version": "1.0.0",
-  "description": "",
+  "description": "catchpoint_node_runs helps stay up to date with any Node status change that might impact your monitoring",
   "main": "node.js",
   "scripts": {
     "start": "npm i && node node_monitor.js",
     "test": "mocha"
   },
   "type": "module",
-  "author": "",
+  "author": "Catchpoint Systems, Inc.",
   "license": "ISC",
   "dependencies": {
     "bunyan": "^1.8.15",

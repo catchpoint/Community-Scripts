@@ -1,13 +1,17 @@
+# dependent packages and files required
 from configparser import ConfigParser
-from api_helper import fetch_node_details,gen_token,write_node_data,compare_node_status,read_node_previous_run_data,write_node_status_change_result
+import sys
+sys.path.append('api')
+from api_helper import fetch_node_details,get_token,write_node_data,compare_node_status,read_node_previous_run_data,write_node_status_change_result
 from process_data import process_node_details
 import os
 import logging
 
 # congiguration
 config = ConfigParser()
-logging.basicConfig(filename='app.log',level=logging.INFO,format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+logging.basicConfig(filename='logs/app.log',level=logging.INFO,format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S')
+
 # -------Auth-----------
 config.read('config.cfg')
 client_key=config.get('auth','client_key')
@@ -18,7 +22,7 @@ node_url=config.get('instance', 'nodes_url')
 token_url=config.get('instance','token_url')
 
 # ---------Files----------
-new_data_ile=config.get('files','new_data_file')
+new_data_file=config.get('files','new_data_file')
 old_data_file=config.get('files','old_data_file')
 result_file=config.get('files','result_file')
 
@@ -30,7 +34,7 @@ result_file=config.get('files','result_file')
 #     read_node_previous_run_data      :     function to read old Node Details
 #     compare_node_status              :     function to compare  Node Details
 #     write_node_status_change_result  :     function to write the differences spotted
-#     gen_token                        :     function to get Access token 
+#     get_token                        :     function to get Access token 
     
 # Files:
 #         FileName                        Description
@@ -40,20 +44,21 @@ result_file=config.get('files','result_file')
 
 # Execution Part starts Here
 try:
-    # get Token
-    token=gen_token(token_url,client_key,client_secret)
+    token=get_token(token_url,client_key,client_secret)
     if token:
         get_new_node_details=fetch_node_details(node_url,token)
         new_run_node_details=process_node_details(get_new_node_details)
-        old_run_node_details = read_node_previous_run_data()
-        if old_run_node_details:
+        old_node_details = read_node_previous_run_data(old_data_file)
+        if old_node_details:
             if(os.stat(old_data_file).st_size == 0):
-                write_node_data(new_run_node_details)
+                # write_node_data(new_node_details)
+                write_node_data(new_run_node_details,old_data_file,new_data_file)
             else:
-                status_result = compare_node_status(old_run_node_details,new_run_node_details)
-                write_node_status_change_result(status_result)
+                status_result = compare_node_status(old_node_details,new_run_node_details,old_data_file,new_data_file)
+                # write_node_status_change_result(status_result)
+                write_node_status_change_result(status_result,result_file)
         else:
-            write_node_data(new_run_node_details)
+             write_node_data(new_run_node_details,old_data_file,new_data_file)
     else:
         logging.error("error generating token")
 except Exception as e:

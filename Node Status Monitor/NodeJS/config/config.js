@@ -7,6 +7,7 @@ var config = {
         result_file: 'nodeData/result.json'
     },
     token_url:'https://io.catchpoint.com/ui/api/token',
-    nodes_detail_url:'https://io.catchpoint.com/ui/api/v1/nodes?targeted=true'
+    nodes_detail_url:'https://io.catchpoint.com/ui/api/v1/nodes?targeted=true',
+    only_changed_data:true
 }
 export default config;
