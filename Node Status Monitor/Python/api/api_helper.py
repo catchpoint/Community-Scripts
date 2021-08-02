@@ -12,7 +12,7 @@ from os import path
 
 # function to get authentication token 
 def get_token(token_Url,client_key, client_secret):
-            logging.info("-------------------- geting token  --------------------")
+            logging.info("-------------------- Getting Token  --------------------")
             values = {'grant_type': 'client_credentials', 'client_id': client_key, 'client_secret': client_secret}
             data = urllib.parse.urlencode(values)
             data = data.encode('utf-8')
@@ -27,7 +27,7 @@ def get_token(token_Url,client_key, client_secret):
 
 # function to fetch Node Details from catchpoint api
 def fetch_node_details(url, token):
-    logging.info("-------------------- fetching Node Details  --------------------")
+    logging.info("-------------------- Fetching Node Details  --------------------")
     try:
         headers = {'content-length': '0',
            'accept': 'application/json',
@@ -41,24 +41,24 @@ def fetch_node_details(url, token):
     except Exception as e:
         logging.exception(str(e))
 
-# function to write Node Details
+# function to write Node Details to files
 def write_node_data(node_data,old_data_file,new_data_file):
     try:
         node_dump_data= json.dumps(node_data)
-        logging.info("-------------------- writing Old Node Details  --------------------")
+        logging.info("-------------------- Writing old Node Details  --------------------")
         old_file = open(old_data_file,'w',encoding = 'utf-8')
         old_file.write(str(node_dump_data)) 
         old_file.close()
-        logging.info("-------------------- writing New Node Details  --------------------")
+        logging.info("-------------------- Writing new Node Details  --------------------")
         new_file = open(new_data_file,'w',encoding = 'utf-8')
         new_file.write(str(node_dump_data)) 
         new_file.close()
     except Exception as e:
         logging.exception(str(e))
 
-# function to write Node Details result
+# function to write Node Details result to file
 def write_node_status_change_result(node_data,result_file):
-    logging.info("-------------------- writing result --------------------")
+    logging.info("-------------------- Writing Result --------------------")
     try:
         result_data= json.dumps(node_data)
         opened_result_file = open(result_file,'w',encoding = 'utf-8')
@@ -71,7 +71,7 @@ def write_node_status_change_result(node_data,result_file):
 def read_node_previous_run_data(old_data_file):
     old_node_details=[]
     try:
-        logging.info("-------------------- reading old node details --------------------")
+        logging.info("-------------------- Reading old Node Details --------------------")
         if path.exists(old_data_file):           
             old_file = open(old_data_file,'r',encoding = 'utf-8') 
             old_node_details = old_file.read()
@@ -83,17 +83,17 @@ def read_node_previous_run_data(old_data_file):
 # function to compare  Node Details
 def compare_node_status(old_data,new_data,old_data_file,new_data_file):
     try:
-        logging.info("-------------------- Comparing  Node Details --------------------")
+        logging.info("-------------------- Comparing Node Details --------------------")
         old_node_details= json.loads(old_data)
-        def comapare(old_node_dataObj):
+        def compare(old_node_dataObj):
             for node_index in range(0,len(new_data)):
                 if old_node_dataObj['id'] == new_data[node_index]['id']:
                     return old_node_dataObj['status'] != new_data[node_index]['status']
             return True
      
-        unique_result = list(filter(comapare,old_node_details))
+        unique_result = list(filter(compare,old_node_details))
         if not unique_result:
-           logging.info("-------------------- no change --------------------")
+           logging.info("-------------------- No Change --------------------")
         else:
              write_node_data(new_data,old_data_file,new_data_file)
         return unique_result

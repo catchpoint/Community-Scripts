@@ -11,7 +11,7 @@ from os import path
 
 # function to get authentiction token
 def get_token(token_url,client_key, client_secret):
-            logging.info("-------------------- Geting token  --------------------")
+            logging.info("-------------------- Getting Token  --------------------")
             values = {'grant_type': 'client_credentials', 'client_id': client_key, 'client_secret': client_secret}
             data = urllib.urlencode(values)
             data = data.encode('utf-8')
@@ -40,22 +40,22 @@ def fetch_node_details(url, token):
     except Exception as e:
         logging.exception(str(e))
 
-# function to write Node Details
+# function to write Node Details to files
 def write_node_data(node_data,old_data_file,new_data_file):
     try:
         node_dump_data= json.dumps(node_data)
-        logging.info("-------------------- Writing Old Node Details  --------------------")
+        logging.info("-------------------- Writing old Node Details  --------------------")
         old_file = open(old_data_file,'w')
         old_file.write(str(node_dump_data)) 
         old_file.close()
-        logging.info("-------------------- Writing New Node Details  --------------------")
+        logging.info("-------------------- Writing new Node Details  --------------------")
         new_file = open(new_data_file,'w')
         new_file.write(str(node_dump_data)) 
         new_file.close()
     except Exception as e:
         logging.exception(str(e))
 
-# function to write Node Details result
+# function to write Node Details result to file
 def write_node_status_change_result(node_data,result_file):
     logging.info("-------------------- Writing result --------------------")
     try:
@@ -93,7 +93,7 @@ def compare_node_status(old_data,new_data,old_data_file,new_data_file):
 
         unique_result = list(filter(compare,old_node_details))
         if not unique_result:
-           logging.info("-------------------- No change --------------------")
+           logging.info("-------------------- No Change --------------------")
         else:
              write_node_data(new_data,old_data_file,new_data_file)   
         return unique_result

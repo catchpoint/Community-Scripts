@@ -10,7 +10,7 @@ import json
 from os import path
 from configparser import ConfigParser
 
-# congiguration
+# Configuration
 config = ConfigParser()
 # -------Auth-----------
 config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..','config.cfg'))

@@ -13,7 +13,7 @@ variables:
 functions:
         Function Name                   Description
     fetch_Data            :     function to fetch Node Details
-    process_node_status   :     function to process Node Details
+    process_node_status   :     function to process Node Details- Converts data into desired object
     write_data            :     function to write Node Details
     read_old_data         :     function to read old Node Details
     compare_data          :     function to compare  Node Details 
@@ -23,7 +23,7 @@ Files:
         FileName                        Description
     new_node_data.json    :      Json Format Result with Node's changed Status
     old_node_data.json    :      Json Format Data Node's status Previous run
-    result.json         :      Json Format Data Node's status Current run  
+    result.json           :      Json Format Data Node's status Current run  
 */
 
 /* Global Variable */
@@ -69,9 +69,9 @@ function fetch_Data(token) {
         })
             .then(res => res.json())
             .then(json => {
-                // if object has propeery Message ,display Error, else Process Data
+                // if object has property Message ,display Error, else Process Data
                 if (json.hasOwnProperty('Message')) {
-                    log.error(`************************* ${json.Message} *************************`);
+                    log.error(`-------------------- ${json.Message} --------------------`);
                     reject(json.Message)
                 } else {
                     resolve(json.items)
@@ -84,7 +84,7 @@ function fetch_Data(token) {
     });
 }
 
-/*function to process Node Details */
+/*function to process Node Details- Converts data into desired object */
 function process_node_status(new_data) {
     log.info("-------------------- Processing Node Details --------------------")
     let new_node_data = new_data.map(item => {
@@ -95,13 +95,12 @@ function process_node_status(new_data) {
             network_type: item.network_type.name
         }
     });
-
     return new_node_data;
 }
 
-/*function to write Node Details */
+/*function to write Node Details to files*/
 function write_data(data) {
-    log.info("-------------------- Writing  Node Details --------------------")
+    log.info("-------------------- Writing Node Details --------------------")
     let parsed_data = JSON.stringify(data);
 
     fs.writeFile(old_data_file, parsed_data, 'utf8', function () {
@@ -175,7 +174,7 @@ function compare_data(old_data, new_data) {
             write_data(compare_result)
         }
     } else {
-        log.info("-------------------- No Chnages --------------------")
+        log.info("-------------------- No Changes --------------------")
         let parsed_empty_result = JSON.stringify([])
         fs.writeFile(result_file, parsed_empty_result, 'utf8', function () {
             log.info(`Uploaded ${result_file}`)

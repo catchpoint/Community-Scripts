@@ -7,7 +7,7 @@ from process_data import process_node_details
 import os
 import logging
 
-# congiguration
+# Configuration
 config = ConfigParser()
 logging.basicConfig(filename='logs/app.log',level=logging.INFO,format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S')
@@ -30,7 +30,7 @@ result_file=config.get('files','result_file')
 #         Function Name                            Description
 #     fetch_node_details               :     function to fetch Node Details
 #     process_node_details             :     function to process Node Details
-#     write_node_data                  :     function to write Node Details
+#     write_node_data                  :     function to write Node Details to files
 #     read_node_previous_run_data      :     function to read old Node Details
 #     compare_node_status              :     function to compare  Node Details
 #     write_node_status_change_result  :     function to write the differences spotted
@@ -51,11 +51,9 @@ try:
         old_node_details = read_node_previous_run_data(old_data_file)
         if old_node_details:
             if(os.stat(old_data_file).st_size == 0):
-                # write_node_data(new_node_details)
                 write_node_data(new_run_node_details,old_data_file,new_data_file)
             else:
                 status_result = compare_node_status(old_node_details,new_run_node_details,old_data_file,new_data_file)
-                # write_node_status_change_result(status_result)
                 write_node_status_change_result(status_result,result_file)
         else:
              write_node_data(new_run_node_details,old_data_file,new_data_file)

@@ -10,7 +10,7 @@ Function to get Authentication token
 */
 function get_token(clientId, clientSecret) {
   return new Promise((resolve, reject) => {
-    log.info("-------------------- Getting token  --------------------")
+    log.info("-------------------- Getting Token  --------------------")
     fetch(token_url,
       {
         method: 'POST',
@@ -23,7 +23,7 @@ function get_token(clientId, clientSecret) {
         if (json.hasOwnProperty('Message')) {
           throw json.Message;
         } else {
-          log.info("-------------------- Received token  --------------------");
+          log.info("-------------------- Received Token  --------------------");
           resolve(json.access_token)
         }
       }).catch(err => {
