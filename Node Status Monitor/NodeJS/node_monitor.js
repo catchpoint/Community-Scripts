@@ -65,7 +65,7 @@ function fetch_Data(token) {
             .then(json => {
                 // if object has property Message ,display Error, else Process Data
                 if (json.hasOwnProperty('Message')) {
-                    log.error(`-------------------- ${json.Message} --------------------`);
+                    log.error(`${json.Message}`);
                     reject(json.Message)
                 } else {
                     resolve(json.items)
