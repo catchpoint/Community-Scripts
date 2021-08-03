@@ -18,15 +18,9 @@ functions:
     read_old_data         :     function to read old Node Details
     compare_data          :     function to compare  Node Details 
     get_token             :     function to get Access token 
-    
-Files:
-        FileName                        Description
-    new_node_data.json    :      Json Format Result with Node's changed Status
-    old_node_data.json    :      Json Format Data Node's status Previous run
-    result.json           :      Json Format Data Node's status Current run  
 */
 
-/* Global Variable */
+// Global Variable
 var only_changed_data = config.only_changed_data; // if true get only changed node status, all node with status
 const nodes_detail_url = config.nodes_detail_url;
 const client_key = config.client_key;
@@ -36,7 +30,7 @@ const new_data_file = config.files.new_data_file;
 const old_data_file = config.files.old_data_file;
 const result_file = config.files.result_file;
 
-/* main function to monitor node status*/
+// main function to monitor node status
 async function monitor_node_status() {
     try {
         let token = await get_token(client_key, client_secret);
@@ -56,7 +50,7 @@ async function monitor_node_status() {
     }
 }
 
-/*function to fetch Node Details */
+// function to fetch Node Details
 function fetch_Data(token) {
     return new Promise((resolve, reject) => {
         log.info("-------------------- Fetching Node Details --------------------")
@@ -84,7 +78,7 @@ function fetch_Data(token) {
     });
 }
 
-/*function to process Node Details- Converts data into desired object */
+// function to process Node Details,Converts data into desired object
 function process_node_status(new_data) {
     log.info("-------------------- Processing Node Details --------------------")
     let new_node_data = new_data.map(item => {
@@ -98,7 +92,7 @@ function process_node_status(new_data) {
     return new_node_data;
 }
 
-/*function to write Node Details to files*/
+// function to write Node Details to files
 function write_data(data) {
     log.info("-------------------- Writing Node Details --------------------")
     let parsed_data = JSON.stringify(data);
@@ -112,7 +106,7 @@ function write_data(data) {
     });
 }
 
-/*function to read old Node Details */
+// function to read old Node Details from file for comparing with latest Node Details.
 function read_old_data() {
     return new Promise((resolve, reject) => {
         if (fs.existsSync(old_data_file)) {
@@ -135,7 +129,7 @@ function read_old_data() {
     });
 }
 
-/*function to compare  Node Details */
+// function to compare Node Details based on their status
 function compare_data(old_data, new_data) {
     log.info("-------------------- Comparing Node Details --------------------")
     let compare_result = [];
@@ -149,14 +143,14 @@ function compare_data(old_data, new_data) {
 
     if (updated_nodes.length) {
         if (only_changed_data) {
-            log.info("-------------------- Getting only Changed Node Details --------------------")
+            log.info("-------------------- Parsing only changed Node Details --------------------")
             let parsed_updated_nodes = JSON.stringify(updated_nodes)
             fs.writeFile(result_file, parsed_updated_nodes, 'utf8', function () {
                 log.info(`Uploaded ${result_file}`)
             });
             write_data(new_data)
         } else {
-            log.info("-------------------- Getting all Node Details with new status --------------------")
+            log.info("-------------------- Parsing all Node Details --------------------")
             new_data.forEach(item => {
                 let found = updated_nodes.some(function (el) {
                     return el.id === item.id;

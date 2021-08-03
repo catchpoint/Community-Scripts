@@ -9,7 +9,7 @@ from configparser import ConfigParser
 import os.path
 from os import path
 
-# function to get authentiction token
+# function to get authentication token from CatchPoint Api's
 def get_token(token_url,client_key, client_secret):
             logging.info("-------------------- Getting Token  --------------------")
             values = {'grant_type': 'client_credentials', 'client_id': client_key, 'client_secret': client_secret}
@@ -24,7 +24,7 @@ def get_token(token_url,client_key, client_secret):
             token_value = json_result['access_token']
             return token_value
 
-# function to fetch Node Details
+# function to fetch Node Details from CatchPoint Api's
 def fetch_node_details(url, token):
     logging.info("-------------------- Fetching Node Details  --------------------")
     try:
@@ -57,7 +57,7 @@ def write_node_data(node_data,old_data_file,new_data_file):
 
 # function to write Node Details result to file
 def write_node_status_change_result(node_data,result_file):
-    logging.info("-------------------- Writing result --------------------")
+    logging.info("-------------------- Writing Resultant Node Details --------------------")
     try:
         result_data= json.dumps(node_data)
         opened_result_file = open(result_file,'w')
@@ -66,7 +66,7 @@ def write_node_status_change_result(node_data,result_file):
     except Exception as e:
         logging.exception(str(e))
 
-# function to read old Node Details
+# function to read old Node Details from file to compare with latest run Node Details
 def read_node_previous_run_data(old_data,new_data,old_data_file,new_data_file):
     old_node_details=[]
     try:
@@ -80,7 +80,7 @@ def read_node_previous_run_data(old_data,new_data,old_data_file,new_data_file):
         logging.exception(str(e))
 
 
-# function to compare  Node Details
+# function to compare  Node Details based on their status
 def compare_node_status(old_data,new_data,old_data_file,new_data_file):
     try:
         logging.info("-------------------- Comparing Node Details --------------------")

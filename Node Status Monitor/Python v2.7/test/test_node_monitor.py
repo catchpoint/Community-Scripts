@@ -56,14 +56,14 @@ class TestNodeMonitor(unittest.TestCase):
         assert len(output_node_data1)==0
         assert len(output_node_data2)>0
 
-#  test function to check whaeter it writes the difference to result file   
+#  test function to check wheather it writes the difference to result file   
     def test_write_node_status_change_result(self):
         data_to_write=[{'id': 1, 'node_name': 'node1', 'status': 'fail', 'network_type': 'backbone'}]
         write_node_status_change_result(data_to_write,result_file)
         result_file_exists=path.exists('../nodeData/result.json')
         assert result_file_exists==True
 
-# test function to check whaeter old and new data files got created orn not
+# test function to check wheather old and new data files got created or not
     def test_write_node_data(self):
         data_to_write=[{'id': 1, 'node_name': 'node1', 'status': 'try', 'network_type': 'backbone'}]
         write_node_data(data_to_write,old_data_file,new_data_file)

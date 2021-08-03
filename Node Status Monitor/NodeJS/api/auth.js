@@ -5,9 +5,7 @@ import log from '../utils/logger.js';
 
 const token_url = config.token_url;
 
-/*
-Function to get Authentication token
-*/
+// Function to get Authentication token from catchpoint api
 function get_token(clientId, clientSecret) {
   return new Promise((resolve, reject) => {
     log.info("-------------------- Getting Token  --------------------")

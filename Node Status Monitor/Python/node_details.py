@@ -35,12 +35,6 @@ result_file=config.get('files','result_file')
 #     write_node_status_change_result  :     function to write the differences spotted
 #     get_token                        :     function to get Access token 
     
-# Files:
-#         FileName                        Description
-#     new_node_data.json    :      Json Format Result with Node's changed Status
-#     old_node_data.json    :      Json Format Data Node's status Previous run
-#     result.json           :      Json Format Data Node's status Current run
-
 # Execution Part starts Here
 try:
     token=get_token(token_url,client_key,client_secret)
