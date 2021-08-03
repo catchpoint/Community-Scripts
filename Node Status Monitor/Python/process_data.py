@@ -1,4 +1,4 @@
-# Function to convert the api response to desired format
+# Function to convert the api response to Custom format for better accessibility and data processing  
 def process_node_details(node_details):
     node_objects = []
     if node_details.get('items'):
