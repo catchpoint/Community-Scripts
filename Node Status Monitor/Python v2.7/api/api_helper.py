@@ -11,18 +11,18 @@ from os import path
 
 # function to get authentication token from CatchPoint Api's
 def get_token(token_url,client_key, client_secret):
-            logging.info("-------------------- Getting Token  --------------------")
-            values = {'grant_type': 'client_credentials', 'client_id': client_key, 'client_secret': client_secret}
-            data = urllib.urlencode(values)
-            data = data.encode('utf-8')
-            req = urllib2.Request(token_url, data)
-            req.add_header('accept', 'application/json')
-            token_value = ''
-            response = urllib2.urlopen(req)
-            result = response.read()
-            json_result = json.loads(result)
-            token_value = json_result['access_token']
-            return token_value
+    logging.info("-------------------- Getting Token  --------------------")
+    values = {'grant_type': 'client_credentials', 'client_id': client_key, 'client_secret': client_secret}
+    data = urllib.urlencode(values)
+    data = data.encode('utf-8')
+    req = urllib2.Request(token_url, data)
+    req.add_header('accept', 'application/json')
+    token_value = ''
+    response = urllib2.urlopen(req)
+    result = response.read()
+    json_result = json.loads(result)
+    token_value = json_result['access_token']
+    return token_value
 
 # function to fetch Node Details from CatchPoint Api's
 def fetch_node_details(url, token):
@@ -67,7 +67,7 @@ def write_node_status_change_result(node_data,result_file):
         logging.exception(str(e))
 
 # function to read old Node Details from file to compare with latest run Node Details
-def read_node_previous_run_data(old_data,new_data,old_data_file,new_data_file):
+def read_node_previous_run_data(old_data_file):
     old_node_details=[]
     try:
         if path.exists(old_data_file):
@@ -95,7 +95,18 @@ def compare_node_status(old_data,new_data,old_data_file,new_data_file):
         if not unique_result:
            logging.info("-------------------- No Change --------------------")
         else:
-             write_node_data(new_data,old_data_file,new_data_file)   
+            write_node_data(new_data,old_data_file,new_data_file)   
         return unique_result
     except Exception as e:
         logging.exception(str(e))
+
+# Function to convert the api response to Custom format for better accessibility and data processing
+def process_node_details(node_details):
+    node_objects = []
+    if node_details.get('items'):
+        for i in range(len(node_details['items'])):
+            node_objects.append({"id":node_details['items'][i]['id'],
+                                 "node_name": node_details['items'][i]['name'],
+                                 "status": node_details['items'][i]['status']['name'],
+                                 "network_type": node_details['items'][i]['network_type']['name']})
+    return node_objects

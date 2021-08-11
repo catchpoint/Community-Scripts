@@ -103,5 +103,3 @@ Output
 Note
 -----
 * `/nodeData/result.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
-
-

@@ -2,8 +2,7 @@
 from configparser import ConfigParser
 import sys
 sys.path.append('api')
-from api_helper import fetch_node_details,get_token,write_node_data,compare_node_status,read_node_previous_run_data,write_node_status_change_result
-from process_data import process_node_details
+from api_helper import fetch_node_details, get_token, write_node_data, compare_node_status, read_node_previous_run_data, write_node_status_change_result, process_node_details
 import os
 import logging
 
@@ -50,7 +49,7 @@ try:
                 status_result = compare_node_status(old_node_details,new_run_node_details,old_data_file,new_data_file)
                 write_node_status_change_result(status_result,result_file)
         else:
-             write_node_data(new_run_node_details,old_data_file,new_data_file)
+            write_node_data(new_run_node_details,old_data_file,new_data_file)
     else:
         logging.error("error generating token")
 except Exception as e:

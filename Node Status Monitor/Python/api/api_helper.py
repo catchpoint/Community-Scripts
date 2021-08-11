@@ -12,18 +12,18 @@ from os import path
 
 # function to get authentication token from CatchPoint Api's
 def get_token(token_Url,client_key, client_secret):
-            logging.info("-------------------- Getting Token  --------------------")
-            values = {'grant_type': 'client_credentials', 'client_id': client_key, 'client_secret': client_secret}
-            data = urllib.parse.urlencode(values)
-            data = data.encode('utf-8')
-            req = urllib.request.Request(token_Url, data)
-            req.add_header('accept', 'application/json')
-            token_value = ''
-            response = urllib.request.urlopen(req)
-            result = response.read().decode('utf-8')
-            json_result = json.loads(result)
-            token_value = json_result['access_token']
-            return token_value
+    logging.info("-------------------- Getting Token  --------------------")
+    values = {'grant_type': 'client_credentials', 'client_id': client_key, 'client_secret': client_secret}
+    data = urllib.parse.urlencode(values)
+    data = data.encode('utf-8')
+    req = urllib.request.Request(token_Url, data)
+    req.add_header('accept', 'application/json')
+    token_value = ''
+    response = urllib.request.urlopen(req)
+    result = response.read().decode('utf-8')
+    json_result = json.loads(result)
+    token_value = json_result['access_token']
+    return token_value
 
 # function to fetch Node Details from CatchPoint Api's
 def fetch_node_details(url, token):
@@ -95,7 +95,18 @@ def compare_node_status(old_data,new_data,old_data_file,new_data_file):
         if not unique_result:
            logging.info("-------------------- No Change --------------------")
         else:
-             write_node_data(new_data,old_data_file,new_data_file)
+            write_node_data(new_data,old_data_file,new_data_file)
         return unique_result
     except Exception as e:
         logging.exception(str(e))
+
+# Function to convert the api response to Custom format for better accessibility and data processing
+def process_node_details(node_details):
+    node_objects = []
+    if node_details.get('items'):
+        for i in range(len(node_details['items'])):
+            node_objects.append({"id":node_details['items'][i]['id'],
+                                 "node_name": node_details['items'][i]['name'],
+                                 "status": node_details['items'][i]['status']['name'],
+                                 "network_type": node_details['items'][i]['network_type']['name']})
+    return node_objects

@@ -2,10 +2,9 @@
 import os, sys
 lib_path = os.path.abspath(os.path.join('../','api'))
 sys.path.append(lib_path)
-from api_helper import fetch_node_details,get_token,write_node_data,compare_node_status,read_node_previous_run_data,write_node_status_change_result
+from api_helper import fetch_node_details, get_token, write_node_data, compare_node_status, read_node_previous_run_data, write_node_status_change_result, process_node_details
 import unittest
 sys.path.append('..')
-from process_data import process_node_details
 import json
 from os import path
 from configparser import ConfigParser

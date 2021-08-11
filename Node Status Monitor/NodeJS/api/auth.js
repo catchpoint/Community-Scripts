@@ -17,7 +17,7 @@ function get_token(clientId, clientSecret) {
       })
       .then(res => res.json())
       .then(json => {
-        // if object has property Message, log as error, otherwise process data
+        // response errors are set in the Message property of the response.
         if (json.hasOwnProperty('Message')) {
           throw json.Message;
         } else {

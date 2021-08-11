@@ -1,9 +1,7 @@
 # dependent packages and files required
 import os, sys
 from configparser import ConfigParser
-from api.api_helper import fetch_node_details,get_token,write_node_data,compare_node_status,read_node_previous_run_data,write_node_status_change_result
-from process_data import process_node_details
-
+from api.api_helper import fetch_node_details, get_token, write_node_data, compare_node_status, read_node_previous_run_data, write_node_status_change_result, process_node_details
 import logging
 
 # Configuration
@@ -34,7 +32,7 @@ result_file=config.get('files','result_file')
 #     compare_node_status              :     function to compare  Node Details
 #     write_node_status_change_result  :     function to write the differences spotted
 #     get_token                        :     function to get Access token 
-    
+
 # Execution Part starts Here
 try:
     token=get_token(token_url,client_key,client_secret)
@@ -49,7 +47,7 @@ try:
                 status_result = compare_node_status(old_node_details,new_node_details,old_data_file,new_data_file)
                 write_node_status_change_result(status_result,result_file)
         else:
-             write_node_data(new_node_details,old_data_file,new_data_file)
+            write_node_data(new_node_details,old_data_file,new_data_file)
     else:
         logging.error("error generating token")
 except Exception as e:

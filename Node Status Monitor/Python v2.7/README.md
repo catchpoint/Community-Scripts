@@ -56,7 +56,6 @@ Python v2.7/
 | ├──api_helper.py             ## Contains APIs related to authentication
 ├── config.cfg                 ## Configuration file
 ├── nodeData
-├── process_data.py            ## Code for data transformation
 ├── node_details.py            ## Main file
 ├── test
 └ └── test_node_monitor.py       ## Unit testing main file
@@ -76,7 +75,6 @@ Python v2.7/
 | ├──new_node_data.json        ## Output file - contains Node status from the current run in JSON format
 | ├──old_node_data.json        ## Output file - contains Node status from the previous run in JSON format
 | ├──result.json               ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
-├── process_data.py            ## Code for data transformation
 ├── node_details.py            ## Main file
 ├── test
 └ └── test_node_monitor.py       ## Unit testing main file
@@ -92,5 +90,3 @@ Output
 Note
 -----
 * `/result.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
-
-
