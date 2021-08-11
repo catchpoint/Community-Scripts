@@ -18,12 +18,12 @@ Installation
 Credentials
 -----------
 
-To retrieve data from Catchpoint's REST API, you must first add your Key and Secret to the `/config/config.js` file.
+To retrieve data from Catchpoint's REST API, you must first add your Key and Secret to the `/config.js` file.
 
 1. Find your Key and Secret in the [Catchpoint Portal](https://portal.catchpoint.com/ui/Content/Administration/ApiDetail.aspx).
-2. Copy your Key and Secret to the respective mappings within `/config/config.cfg`:
+2. Copy your Key and Secret to the respective mappings within `/config.js`:
   
-```  
+```  javascript
 1  var config = {
 2    client_key: '<your key>',
 3    client_secret: '<your secret>',  
@@ -37,69 +37,61 @@ How To Run
 or
 
 1. `npm install`
-2. `node node_monitor.js`
+1. `mkdirp output`
+1. `node node_monitor.js`
 
 How to Run Unit Test Cases
 --------------------------
 
-1. Run `npm test` in the package directory 
-
+1. Run `npm test` in the package directory
 
 File Structure [Before Execution]
 -----------------------------------
 
-```
+```sh
 NodeJs/
-├── api
-| ├── auth.js             ## Contains APIs related to authentication
-├── config
-| ├── config.js           ## Configuration file
-├── logs                  
-| ├── info
-| ├── error
-├── nodeData
-├── test
-| ├── test.js             ## Unit test main file
-├── utils
-| ├── logger.js           ## Logger utility
-├──package.json           ## Project dependencies
-└── node_monitor.js       ## Main file
+├── src
+| ├── auth.js             ## Authentication API processing
+| ├── config.js           ## Configuration
+| ├── logger.js           ## Logger setup
+| ├── node_monitor.js     ## Main file
+├── tests
+| ├── full.js             ## Unit tests
+├── package.json          ## Project dependencies
+└── Readme.md             ## This file
 ```
 
 File Structure [After Execution]
 -----------------------------------
 
-```
+```sh
 NodeJs/
-├── api
-| ├── auth.js             ## Contains APIs related to authentication
-├── config
-| ├── config.js           ## Configuration file
-├── logs
-| ├── info
-| |  ├── info.log         ## Contains informational logs. File name will be based on date of execution
-| ├── error
-| |  ├── error.log        ## Contains error logs. File name will be based on date of execution
-├── nodeData
-| ├── new_node_data.json    ## Output file - contains Node status from the current run in JSON format
-| ├── old_node_data.json    ## Output file - contains Node status from the previous run in JSON format
+├── src
+| ├── auth.js             ## Authentication API processing
+| ├── config.js           ## Configuration
+| ├── logger.js           ## Logger setup
+| ├── node_monitor.js     ## Main file
+├── output
+| ├── info.log            ## Contains informational logs. File name will be based on date of execution
+| ├── error.log           ## Contains error logs. File name will be based on date of execution
+| ├── new_node_data.json  ## Output file - contains Node status from the current run in JSON format
+| ├── old_node_data.json  ## Output file - contains Node status from the previous run in JSON format
 | ├── result.json         ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
-├── test
-| ├── test.js             ## contains unit test cases 
-├── utils
-| ├── logger.js           ## logger utility
-├──package.json           ## project dependencies
-└── node_monitor.js        ## main file
-```
+├── tests
+| ├── full.js             ## Unit tests
+├── package.json          ## Project dependencies
+└── Readme.md             ## This file
 
+```
 
 Output
 -------
 
-* **`/nodeData/new_node_data.json`**    : Contains Node status from the current run in JSON format
-* **`/nodeData/old_node_data.json`**    : Contains Node status from the previous run in JSON format
-* **`/nodeData/result.json`**           : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
+* **`/output/new_node_data.json`**    : Contains Node status from the current run in JSON format
+* **`/output/old_node_data.json`**    : Contains Node status from the previous run in JSON format
+* **`/output/result.json`**           : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
 
 Note
 -----
-* `/nodeData/result.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
+
+* `/output/result.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.

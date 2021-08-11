@@ -2,10 +2,10 @@
   "name": "catchpoint_node_runs",
   "version": "1.0.0",
   "description": "catchpoint_node_runs helps stay up to date with any Node status change that might impact your monitoring",
-  "main": "node.js",
+  "main": "src/node_monitor.js",
   "scripts": {
-    "start": "npm i && node node_monitor.js",
-    "test": "mocha"
+    "start": "npm i && mkdirp output && node ./src/node_monitor.js",
+    "test": "npm i && mkdirp output && mocha"
   },
   "type": "module",
   "author": "Catchpoint Systems, Inc.",
@@ -15,6 +15,7 @@
     "bunyan-rotating-file-stream": "^1.6.3",
     "dotenv": "^10.0.0",
     "form-data": "^4.0.0",
+    "mkdirp": "^1.0.4",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {

@@ -1,31 +1,15 @@
 /* dependent packages and files required */
 import fetch from 'node-fetch';
 import fs from 'fs';
-import log from './utils/logger.js';
-import { get_token } from './api/auth.js';
-import config from './config/config.js';
+import log from './logger.js';
+import { get_token } from './auth.js';
+import config from './config.js';
 
-/* 
-variables:
-        Key                             Description
-    Only_changed_data :  if true get only changed node status, all node with status
-    
-functions:
-        Function Name                   Description
-    fetch_Data            :     function to fetch Node Details
-    process_node_status   :     function to process Node Details- Converts data into desired object
-    write_data            :     function to write Node Details
-    read_old_data         :     function to read old Node Details
-    compare_data          :     function to compare  Node Details 
-    get_token             :     function to get Access token 
-*/
-
-// Global Variable
-var only_changed_data = config.only_changed_data; // if true get only changed node status, all node with status
+const only_changed_data = config.only_changed_data; 
 const nodes_detail_url = config.nodes_detail_url;
 const client_key = config.client_key;
 const client_secret = config.client_secret;
-// files
+
 const new_data_file = config.files.new_data_file;
 const old_data_file = config.files.old_data_file;
 const result_file = config.files.result_file;
@@ -133,7 +117,7 @@ function read_old_data() {
 function compare_data(old_data, new_data) {
     log.info("-------------------- Comparing Node Details --------------------")
     let compare_result = [];
-    var updated_nodes = old_data.filter( old_node => {
+    var updated_nodes = old_data.filter(old_node => {
         return new_data.some(new_node => {
             if (old_node.id == new_node.id) {
                 return old_node.status != new_node.status

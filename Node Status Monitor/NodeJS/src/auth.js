@@ -1,11 +1,11 @@
 // dependent packages and files required
 import fetch from 'node-fetch';
-import config from '../config/config.js';
-import log from '../utils/logger.js';
+import config from './config.js';
+import log from './logger.js';
 
 const token_url = config.token_url;
 
-// Function to get Authentication token from catchpoint api
+// Retrieve  Authentication token from catchpoint api
 function get_token(clientId, clientSecret) {
   return new Promise((resolve, reject) => {
     log.info("-------------------- Getting Token  --------------------")
@@ -17,7 +17,7 @@ function get_token(clientId, clientSecret) {
       })
       .then(res => res.json())
       .then(json => {
-        // response errors are set in the Message property of the response.
+        // errors are set in the Message property of the response.
         if (json.hasOwnProperty('Message')) {
           throw json.Message;
         } else {
