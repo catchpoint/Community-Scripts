@@ -1,7 +1,7 @@
 Node Status Monitor (Python v2.7)
 ===================
 
-This document provides instructions for installing and using the Python v2.7 version of Catchpoint's Node Status Monitor. For general information about Node Status Monitor, see the main [README](https://github.com/Schultztw/Community-Scripts/blob/June2021_NodeStatusMonitor/Node%20Status%20Monitor/README.md).
+This document provides instructions for installing and using the Python v2.7 version of Catchpoint's Node Status Monitor. For general information about Node Status Monitor, see the main [README](https://github.com/catchpoint/Community-Scripts/blob/main/Node%20Status%20Monitor/README.md).
 
 Prerequisites
 -------------------------------
