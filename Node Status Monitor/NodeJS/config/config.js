@@ -1,13 +1,24 @@
 var config = {
+    // Catchpoint API Keys
     client_key: '',
     client_secret: '',
-    files: {
-        new_data_file: 'nodeData/new_node_data.json',
-        old_data_file: 'nodeData/old_node_data.json',
-        result_file: 'nodeData/result.json'
-    },
-    token_url:'https://io.catchpoint.com/ui/api/token',
-    nodes_detail_url:'https://io.catchpoint.com/ui/api/v1/nodes?targeted=true',
-    only_changed_data:true
+    // Options for lookUp fields
+    // NOTE: keys are case-sensitive
+    /*
+        'id'                    : Node Id
+        'name'                  : Node Name
+        'status.name'           : Node status 
+        'network_type.name'     : Node Network Type
+        'ip_ranges'             : Node Ip ranges
+        'isp.name'              : Node ISP
+        'asn.name'              : ASN Name
+        'city.name'             : Node City Name
+        'region.name'           : Region Name
+        'country.name'          : Country Name
+        'continent.name'        : Continent Name
+        'coordinates.latitude'  : Node coordinates latitude
+        'coordinates.longitude' : Node coordinates longitude
+    */
+    lookUp_fields:['status.name','ip_ranges']// if list is empty,then default field will be 'status.name'.
 }
 export default config;

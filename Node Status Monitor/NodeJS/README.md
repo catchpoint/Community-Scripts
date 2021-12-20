@@ -29,6 +29,32 @@ To retrieve data from Catchpoint's REST API, you must first add your Key and Sec
 3    client_secret: '<your secret>',  
 ```
 
+LookUp for field change
+----------
+To find differences in node's Data, you must update lookUp_fields in `/config/config.js` file.
+
+```  
+Fields available for lookup_fields are :
+        'name'                  : Node Name
+        'status.name'           : Node status 
+        'network_type.name'     : Node Network Type
+        'ip_ranges'             : Node Ip ranges
+        'isp.name'              : Node ISP
+        'asn.name'              : ASN Name
+        'city.name'             : Node City Name
+        'region.name'           : Region Name
+        'country.name'          : Country Name
+        'continent.name'        : Continent Name
+        'coordinates.latitude'  : Node coordinates latitude
+        'coordinates.longitude' : Node coordinates longitude
+```
+
+sample to check status and ip ranges of node, you must update lookup_fields as follows,
+```
+lookUp_fields:['status.name','ip_ranges'] 
+```
+*  if lookUp_fields is empty,then default value for lookUp_fields will be 'status.name'.
+
 How To Run
 -----------
 
@@ -50,20 +76,19 @@ File Structure [Before Execution]
 
 ```
 NodeJs/
-├── api
-| ├── auth.js             ## Contains APIs related to authentication
 ├── config
-| ├── config.js           ## Configuration file
+| ├── config.js                ## Configuration file
+├── libs
+| ├── api.js                   ## Contains APIs related to catchpoint authentication and nodes 
+| ├── common.js                ## contains function related to read/write of file,compare nodes
 ├── logs                  
-| ├── info
-| ├── error
-├── nodeData
-├── test
-| ├── test.js             ## Unit test main file
+| ├── info                     ## Contains application info logs
+| ├── error                    ## Contains application error logs
 ├── utils
-| ├── logger.js           ## Logger utility
-├──package.json           ## Project dependencies
-└── node_monitor.js       ## Main file
+| ├── application_constants.js ## Application constants
+| ├── logger.js                ## Logger utility
+├──package.json                ## Project dependencies
+└── node_monitor.js            ## Main file
 ```
 
 File Structure [After Execution]
@@ -71,35 +96,36 @@ File Structure [After Execution]
 
 ```
 NodeJs/
-├── api
-| ├── auth.js             ## Contains APIs related to authentication
 ├── config
-| ├── config.js           ## Configuration file
+| ├── config.js                ## Configuration file
+├── libs
+| ├── api.js                   ## Contains APIs related to catchpoint authentication and nodes
+| ├── common.js                ## contains function related to read/write of file,compare nodes
 ├── logs
 | ├── info
-| |  ├── info.log         ## Contains informational logs. File name will be based on date of execution
+| |  ├── info.log              ## Contains informational logs. File name will be based on date of execution
 | ├── error
-| |  ├── error.log        ## Contains error logs. File name will be based on date of execution
-├── nodeData
-| ├── new_node_data.json    ## Output file - contains Node status from the current run in JSON format
-| ├── old_node_data.json    ## Output file - contains Node status from the previous run in JSON format
-| ├── result.json         ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
-├── test
-| ├── test.js             ## contains unit test cases 
+| |  ├── error.log             ## Contains error logs. File name will be based on date of execution
+├── Output
+| ├── details
+| |  ├── new_node_data.json    ## Output file - contains Node status from the current run in JSON format
+| |  ├── old_node_data.json    ## Output file - contains Node status from the previous run in JSON format
+| ├── changes_in_status.json   ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
 ├── utils
-| ├── logger.js           ## logger utility
-├──package.json           ## project dependencies
-└── node_monitor.js        ## main file
+| ├── application_constants.js ## Application constants
+| ├── logger.js                ## logger utility
+├──package.json                ## project dependencies
+└── node_monitor.js            ## main file
 ```
 
 
 Output
 -------
 
-* **`/nodeData/new_node_data.json`**    : Contains Node status from the current run in JSON format
-* **`/nodeData/old_node_data.json`**    : Contains Node status from the previous run in JSON format
-* **`/nodeData/result.json`**           : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
+* **`/Output/details/new_node_data.json`**    : Contains Node status from the current run in JSON format
+* **`/Output/details/old_node_data.json`**    : Contains Node status from the previous run in JSON format
+* **`/Output/changes_in_status.json`**        : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
 
 Note
 -----
-* `/nodeData/result.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
+* `/Output/changes_in_status.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
