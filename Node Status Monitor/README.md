@@ -32,6 +32,6 @@ Installation and Use
 This document summarizes the design and functionality of the Node Status Monitor. For detailed installation and usage instructions specific to each language,
 see the README for the specific version:
 
-- [node.js README](https://github.com/catchpoint/Community-Scripts/blob/main/Node%20Status%20Monitor/NodeJS/README.md)
-- [python 2.7 README](https://github.com/catchpoint/Community-Scripts/blob/main/Node%20Status%20Monitor/Python%20v2.7/README.md)
-- [python (3.x) README](https://github.com/catchpoint/Community-Scripts/blob/main/Node%20Status%20Monitor/Python/README.md)
+- [node.js README](./NodeJS/README.md)
+- [python 2.7 README](./Python%20v2.7/README.md)
+- [python (3.x) README](./Python/README.md)

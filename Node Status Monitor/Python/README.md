@@ -23,7 +23,7 @@ Run the following commands from the `/Python` folder:
 Credentials 
 -----------
 
-To retrieve data from Catchpoint's REST API, you must first add your Key and Secret to the `/config.js` file.
+To retrieve data from Catchpoint's REST API, you must first add your Key and Secret to the `/config.cfg` file.
 
 1. Find your Key and Secret in the [Catchpoint Portal](https://portal.catchpoint.com/ui/Content/Administration/ApiDetail.aspx).
 2. Copy your Key and Secret to the respective mappings within `/config.cfg`:
@@ -34,14 +34,40 @@ To retrieve data from Catchpoint's REST API, you must first add your Key and Sec
 10  client_secret=<your secret>
 ```
 
+LookUp for field change
+----------
+To find differences in node's Data, you must update lookUp_fields in `/config/config.cfg` file.
+
+```  
+Fields available for lookup_fields are:
+        'name'                  : Node Name
+        'status.name'           : Node status 
+        'network_type.name'     : Node Network Type
+        'ip_ranges'             : Node Ip ranges
+        'isp.name'              : Node ISP
+        'asn.name'              : ASN Name
+        'city.name'             : Node City Name
+        'region.name'           : Region Name
+        'country.name'          : Country Name
+        'continent.name'        : Continent Name
+        'coordinates.latitude'  : Node coordinates latitude
+        'coordinates.longitude' : Node coordinates longitude
+```
+sample to check status and ip ranges of node, you must update lookup_fields as follows,
+```
+[monitor]
+lookUp_fields:['status.name','ip_ranges']
+```
+*  if lookUp_fields is empty,then default value for lookUp_fields will be 'status.name'.
+
 How To Run
 -----------
 
-* python node_details.py
+* python node_monitor.py
 
 How To Run Unit Test Cases
 --------------------------
-* test folder being working directory
+* Python folder being working directory
 * Run python test_node_monitor.py
 
 File Structure [Before Execution]
@@ -49,15 +75,18 @@ File Structure [Before Execution]
 
 ```
 Python/
-├── logs
-| ├──app.log                   ## Contains application logs
-├── api
-| ├──api_helper.py             ## Contains APIs related to authentication
-├── config.cfg                 ## Configuration file
-├── nodeData
-├── node_details.py            ## Main file
-├── test
-└ └── test_node_monitor.py       ## Unit testing main file
+├── config
+| ├── config.cfg               ## Configuration file      
+├── libs
+| ├── api.py                   ## Contains APIs related to catchpoint authentication and nodes
+| ├── common.py                ## contains function related to read/write of file,compare nodes
+├── logs                  
+| ├── info                     ## Contains application info logs
+| ├── error                    ## Contains application error logs
+├── utils
+| ├── application_constants.py ## Application constants
+| ├── logger.py                ## Logger utility
+└── node_monitor.py            ## Main file
 ```
 
 File Structure [After Execution]
@@ -65,28 +94,32 @@ File Structure [After Execution]
 
 ```
 Python/
-├── logs
-| ├──app.log                   ## Contains application logs
-├── api
-| ├──api_helper.py             ## Contains APIs related to authentication
-├── config.cfg                 ## Configuration file
-├── nodeData
-| ├──new_node_data.json        ## Output file - contains Node status from the current run in JSON format
-| ├──old_node_data.json        ## Output file - contains Node status from the previous run in JSON format
-| ├──result.json               ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
-├── node_details.py            ## Main file
-├── test
-└ └── test_node_monitor.py       ## Unit testing main file
+├── config
+| ├── config.cfg               ## Configuration file      
+├── libs
+| ├── api.py                   ## Contains APIs related to catchpoint authentication and nodes
+| ├── common.py                ## contains function related to read/write of file,compare nodes
+├── logs                  
+| ├── info                     ## Contains application info logs
+| ├── error                    ## Contains application error logs
+├── utils
+| ├── application_constants.py ## Application constants
+| ├── logger.py                ## Logger utility
+├── Output
+| ├── details
+| |  ├── new_node_data.json    ## Output file - contains Node status from the current run in JSON format
+| |  ├── old_node_data.json    ## Output file - contains Node status from the previous run in JSON format
+| ├── changes_in_status.json   ## Output file - contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
+└── node_monitor.py            ## Main file
 ```
-
 
 Output
 -------
 
-* **`/new_node_data.json`**    : Contains Node status from the current run in JSON format
-* **`/old_node_data.json`**    : Contains Node status from the previous run in JSON format
-* **`/result.json`**           : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
+* **`/Output/details/new_node_data.json`**    : Contains Node status from the current run in JSON format
+* **`/Output/details/old_node_data.json`**    : Contains Node status from the previous run in JSON format
+* **`/Output/changes_in_status.json`**        : Contains Nodes' changed status in JSON format (generated from comparison of new and old node data)
 
 Note
 -----
-* `/result.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
+* `/Output/changes_in_status.json` will not be created the first time you run Node Status Monitor as there will be no old node data to compare.
